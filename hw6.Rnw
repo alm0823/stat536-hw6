@@ -111,7 +111,6 @@ require(mblm)
 model1s<-mblm(PropDays~Year,data=Data1,repeated=F)
 
 year <- data.frame(replicate(10000, shuffle(Data1$Year)))
-lapply(year, lm(year$pdays~))
 year$pdays <- Data1$PropDays
 mblm.mod <- NULL
 mblm.coeff <- NULL
@@ -149,11 +148,24 @@ CI<-confint(model1s)[2,] #Extract CI and check whether 0 is in interval
 \end{itemize}
 
 \item%7
-{\it Instead of white noise errors, we might also be interested in Type I error rates when we have autocorrelation present (again with no trend in the true process). Use the results for an AR(1) process variance (derived in class) to calculate the white noise variance needed to generate a process with the same variance as you used for your previous simulation, but when $\phi$=0.3 and 0.6. In other words, $\gamm_0$ of the AR(1) process needs to match the white noise variance used above and the white noise process driving the AR(1) process needs to be adjusted appropriately.}
+{\it Instead of white noise errors, we might also be interested in Type I error rates when we have autocorrelation present (again with no trend in the true process). Use the results for an AR(1) process variance (derived in class) to calculate the white noise variance needed to generate a process with the same variance as you used for your previous simulation, but when $\phi$=0.3 and 0.6. In other words, $\gamma_0$ of the AR(1) process needs to match the white noise variance used above and the white noise process driving the AR(1) process needs to be adjusted appropriately.}
+
+Let $\phi^{k}$ = the correlation between observations taken k time points apart (k lags apart), such that for time points 0 units apart, $\phi^{0}$ = 1.
+
+In class we derived that the variance at a given time point, Var($y_{t}$) = Cov($y_{t}$,$y_{t}$) = $\frac{\sigma^2_{e}}{(1-\phi^2)$}.
+
 
 \begin{enumerate}
 \item%7a
 {\it Show your derivation of the required white noise variances first for $\phi=0.3$ and $\phi=0.6$.}
+
+{\bf Take residual standard error and input in here.}
+
+White Noise Variance = $\sigma^2$
+
+$\sigma^2_{0.03}$ = $\frac{##}{1-0.03}  = \frac{##}{0.97} = ##$
+
+$\sigma^2_{0.06}$ = $\frac{##}{1-0.06}  = \frac{##}{0.94} = ##$
 
 \item%7b
 {\it To simulate the process we can use this value in the ``arima.sim" function in something like ``arima.sim(n=2000,list(ar=c(0.3)),sd=5)" where ``n=2000" provides 2000 simulated observations, ``model=list(ar=c(0.3))" determines that we are using an AR(1) process with parameter of of 0.3, and ``sd=5" controls the SD of the normal white noise used to build the AR(1) process (this is {\bf not} the variance of the AR(1) process). Check that you get about your expected results using something like:}
@@ -163,6 +175,10 @@ CI<-confint(model1s)[2,] #Extract CI and check whether 0 is in interval
 <<prob7b, warning=F,message=F, include=FALSE>>=
 ar1sim<-arima.sim(n=2000,model=list(ar=c(0.6)),sd=5)
 var(ar1sim)
+
+ar1sim<-arima.sim(n=2000,model=list(ar=c(0.3)),sd=5)
+var(ar1sim)
+
 @
 
 \item%8
