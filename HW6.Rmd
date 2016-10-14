@@ -1,0 +1,79 @@
+---
+title: "HW 6"
+author: "Mark Greenwood"
+date: "October X, 2016"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+We will explore one series like those you found in the Vincent and Meki's paper, but for Bozeman.
+
+The following code will count the days in Bozeman where the minimum temperature was measured to be below 32 degrees F (0 degrees C) and the number of days where information was available in `Data1`.
+```{r,warning=F,message=F}
+Bozeman<-read.csv("https://dl.dropboxusercontent.com/u/77307195/Bozeman.csv",header=T)
+
+monthsF<-sort(unique(Bozeman$MonthRE))
+countfun<-function(x) c(sum(x<32),sum(!is.na(x)))
+
+  monthcountMINF<-aggregate(Bozeman$TMIN..F.,by=list(Bozeman$MonthRE),FUN=countfun)
+  yearcountMINF<-aggregate(Bozeman$TMIN..F.,by=list(Bozeman$Year),FUN=countfun)
+  
+  Data1<-data.frame(Year=yearcountMINF[,1],DaysBelow32=yearcountMINF$x[,1],MeasuredDays=yearcountMINF$x[,2],PropDays=yearcountMINF$x[,1]/yearcountMINF$x[,2])
+```  
+
+1) Make nice looking and labeled time series plots of the number of days below freezing and the proportion of measured days below freezing. 
+
+
+
+2) Estimate a linear trend model for the proportion of measured days below freezing and report the parametric (t-test) linear trend test results in a sentence. Also discuss scope of inference for this test in a sentence or two (random sampling and random assignment and their implications).
+
+
+
+3) Discuss this proportion response versus using the count of days below zero per year, specific to this example and in general. What issues does using one or the other present? 
+
+4) Generate a permutation test for the trend with the proportion response. I performed one in the syllabus (page 6) using the `shuffle` function from the `mosaic` package. Report a plot of the permutation distribution, the _test statistic_ you used, and a p-value. Generally randomization based tests are more robust to violations of the normality assumption as long as the distribution (shape and variability) is the same for all observations except for differences in the _center_ or mean. Why would that be advantageous with this response?
+
+
+
+5) The Sen estimator or, more commonly, Theil-Sen is based on a single median of all the possible pairwise generated slopes. Its standard version is available in the `mblm` (median based linear models) R package developed by Lukasz Komsta. The package description provides more details (https://cran.r-project.org/web/packages/mblm/mblm.pdf). Note that with `mblm`, you need to use `repeated=FALSE` to get the Theil-Sen estimator and not the better estimator developed by Siegel. The package has a `summary` function that provides a test based on the nonparametric Wilcox test but it had terrible Type I error rates when I explored it. Without further explorations, I would recommend avoiding its use. Fortunately, our permutation approach can be used to develop a test based on the Theil-Sen slope coefficient. First, compare the estimated slope provided by `mblm` to what you found from the linear model and its permutation test. Then develop a permutation test based on the slope coefficient from `mblm` - note that `mblm` conveniently has the same output structure as `lm`. The confidence interval that runs on `mblm` seems to perform well enough to study, so we can make 95% confidence intervals and check whether 0 is in the interval or not as the following code suggests to use it to perform our 5% significance level hypothesis test.
+
+
+```{r,warning=F,message=F}
+require(mblm)
+model1s<-mblm(PropDays~Year,data=Data1,repeated=F)
+summary(model1s)
+confint(model1s)
+CI<-confint(model1s)[2,] #Extract CI and check whether 0 is in interval
+(0>CI[1])&(0<CI[2]) #If 0 is in interval, FTR H0
+
+```
+
+6) Use the residual error variance estimate from your linear model for the proportion responses to simulate a series with no trend (constant mean and you can leave it at 0) and normal white noise with that same variance. Use that simulation code to perform a simulation study of the Type I error rate for the parametric t-test for the slope coefficient, the test using the confidence interval from `mblm`, and your permutation test (use 500 permutations and do 250 simulations to keep the run time somewhat manageable). Report the simulation-based Type I error rates when using a 5% significance level test for the three procedures with the same sample size as the original data set. 
+
+  - For the parametric test, the p-value can be extracted from the `lm`  model `summary`'s using `summary(model1)$coef[2,4]`.
+  
+  - It is best and easiest if you do one loop for the simulations and then for each simulated data set in each loop generate the three test results, extracting the p-values that each produces. If you struggle to set this up, please send me an email or stop by with an attempt at your code for some feedback.
+  
+  - This will be computationally intensive. To avoid needing to re-run results in R-markdown, you can try the `cache=T` option for any of the permutation or simulation code chunks. Or for this section, you can just report the three error rates and comment out the code you used.
+
+
+7) Instead of white noise errors, we might also be interested in Type I error rates when we have autocorrelation present (again with no trend in the true process). Use the results for an AR(1) process variance (derived in class) to calculate the white noise variance needed to generate a process with the same variance as you used for your previous simulation, but when $\phi$=0.3 and 0.6. In other words, $\gamm_0$ of the AR(1) process needs to match the white noise variance used above and the white noise process driving the AR(1) process needs to be adjusted appropriately. 
+
+  - Show your derivation of the required white noise variances first for $\phi=0.3$ and $\phi=0.6$. 
+    
+  - To simulate the process we can use this value in the `arima.sim` function in something like `arima.sim(n=2000,list(ar=c(0.3)),sd=5)` where `n=2000` provides 2000 simulated observations, `model=list(ar=c(0.3))` determines that we are using an AR(1) process with parameter of of 0.3, and `sd=5` controls the SD of the normal white noise used to build the AR(1) process (this is _not_ the variance of the AR(1) process). Check that you get about your expected results using something like:
+```{r,warning=F,message=F}
+ar1sim<-arima.sim(n=2000,model=list(ar=c(0.6)),sd=5)
+var(ar1sim)
+```
+
+8) Repeat your simulation study of the parametric, permutation, and Theil-Sen linear trend test based on the CI. Report the estimated Type I error rates in the presence of AR(1) correlations with a parameter of 0.6 based on your work in the previous question for simulating the response time series. Discuss the impacts of having autocorrelation present on the various procedures.
+
+
+
+9) The Zhang method you read about is also available in the `zyp` package but it only provides confidence intervals and I am not completely convinced by their discussion of the intervals provided without more exploration. But you can get estimates from `zyp.sen` and confidence intervals using `confint.zyp` on the results from `zyp.sen`. The `confint` function can also be applied to `mblm` results. Find and compare the two confidence intervals for the Sen-estimators for the proportion response time series. No simulation study here - just complete the analysis.  
+
+10) Make a plot of the original proportion response time series with the parametric linear, Theil-Sen, and Zhang methods/models on the same plot. You may want to use `plot(y~x,type="l")` and then add lines to the plot.
