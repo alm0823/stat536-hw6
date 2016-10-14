@@ -62,7 +62,7 @@ ggplot(data = Data1, aes(x = Year, y = PropDays)) + geom_point() + scale_x_conti
 
 
 \item%2
-{\it How many response variables are they analyzing? Explain one temperature and one precipitation based response that they are using in detail.}
+{\it Estimate a linear trend model for the proportion of measured days below freezing and report the parametric (t-test) linear trend test results in a sentence. Also discuss scope of inference for this test in a sentence or two (random sampling and random assignment and their implications).}
 
 \item%3
 {\it Discuss this proportion response versus using the count of days below zero per year, specific to this example and in general. What issues does using one or the other present?}
@@ -73,7 +73,7 @@ Specific in to these data, temperature was not recorded every day of each year.T
 {\it Generate a permutation test for the trend with the proportion response. I performed one in the syllabus (page 6) using the ``shuffle" function from the ``mosaic" package. Report a plot of the permutation distribution, the {\bf test statistic} you used, and a p-value. Generally randomization based tests are more robust to violations of the normality assumption as long as the distribution (shape and variability) is the same for all observations except for differences in the {\it center} or mean. Why would that be advantageous with this response?}
 
 <<prob4>>=
-lm <- NULL
+lm <- numeric(10000)
 lm_year.b <- NULL
 
 for(i in 1:10000){
@@ -112,12 +112,15 @@ model1s<-mblm(PropDays~Year,data=Data1,repeated=F)
 
 year <- data.frame(replicate(10000, shuffle(Data1$Year)))
 year$pdays <- Data1$PropDays
+shuffled.frame <- data.frame(pdays = year$pdays)
 mblm.mod <- NULL
-mblm.coeff <- NULL
-x <- NULL
-for(i in 1:5){
-  mblm.mod[i] <- mblm(pdays~year[,i], data=year,repeated = F)
-}
+mblm.coeff <- numeric(10000)
+mblm.mod <- lapply(1:5, function(i){
+  shuffled.frame$year <- year[,i]
+  return(mblm(pdays~year, data=shuffled.frame,repeated = F))
+})
+# Excercise for Andrea!
+#mblm.coeff[i] <- coef(mblm.mod)[2]
 
 s1 <- NULL
 s1$year <- shuffle(Data1$Year)
