@@ -29,6 +29,7 @@ library(ggplot2)
 library(xtable)
 library(mosaic)#shuffle
 library(mblm)#sen
+library(zyp)#zhang
 options(xtable.table.placement = "H", xtable.caption.placement = "top",
         #width = 80, scipen = 1, show.signif.stars = FALSE)
 @
@@ -126,18 +127,14 @@ mblm.coeff <- sapply(mblm.mod, function(x){coef(x)[2]})
 
 pvalue.mblm <- length(c(which(mblm.coeff<=model1s.coef), which(mblm.coeff>=-model1s.coef)))/length(mblm.coeff)
 
+pvalue.mblm.save <- 0.3476
+
+
+
 
 confint(model1s)
 CI<-confint(model1s)[2,] #Extract CI and check whether 0 is in interval
-(0>CI[1])&(0<CI[2]) #If 0 is in interval, FTR H0
-
-confint(mblm.mod[[1]])[2,]
-
-fn.confint <- function(x){
-  confint(x)[2,]
-}
-
-out <- mblm.mod[[1]]
+#(0>CI[1])&(0<CI[2]) #If 0 is in interval, FTR H0
 
 dec.mblm <- c(rep(0,10000))
 
@@ -146,17 +143,37 @@ for(i in 1:10000){
   dec.mblm[i] <- ifelse(confint(mblm.mod[[i]])[2,1]<0 & confint(mblm.mod[[i]])[2,2]>=0, "R", "FTR")
 }
 
-pvalue.mblm <- length(which(as.factor(dec.mblm) == "R"))/length(dec.mblm)
+cl.mblm.confint <- length(which(as.factor(dec.mblm) == "R"))/length(dec.mblm)
+
+cl.mblm.confint.save <- 0.3476
 @
 
 {\texttt lm()} gave an estimated slope coefficeint of \Sexpr{coef(lm.Year)[2]} and {\texttt mblm()} gave an estimated slope coefficient of \Sexpr{coef(model1s)[2]}.
 
+Using the same hypotheses from 4, but with the {\texttt mblm()} function fitting the model with the median response, the permutation test based on 10,000 iterations led to a pvalue of \Sexpr{pvalue.mblm} using the test statistic of the observed slope coefficient (\Sexpr{coef(model1s)[2]}) and the null hypothesis of no relationship between year and temperature. The explicit hypotheses are stated below. There is strong evidence that year had an effect on median temperature in these data. 
+$H_{o}$: $\beta_{Year.median}$ = 0
+
+$H_{a}$: $\beta_{Year.median} \neq$ 0
+
+It is estimated that the median temperature in this data set decreased by \Sexpr{coef(model1s)[2]} $\degrees$F each year with an associated 95\% confidence interval of \Sexpr{CI[1]} to \Sexpr{CI[2]} $\degrees$F.
+
+However, I would question the validity of the confidence level set using {\texttt confint()} on an {\texttt mblm()} object. If there was strong evidence of an effect of temperature, at the 95\% confidence level, we would expect to ``reject" 5\% of the time, meaning that approximately 5\% of confidence intervals, in the long run, should contain 0. We ran 10,000 simulations and \Sexpr{cl.mblm.confint*100}\% contained 0. Something is wrong.
+
+
 \item%6
 {\it Use the residual error variance estimate from your linear model for the proportion responses to simulate a series with no trend (constant mean and you can leave it at 0) and normal white noise with that same variance. Use that simulation code to perform a simulation study of the Type I error rate for the parametric t-test for the slope coefficient, the test using the confidence interval from ``mblm", and your permutation test (use 500 permutations and do 250 simulations to keep the run time somewhat manageable). Report the simulation-based Type I error rates when using a 5\% significance level test for the three procedures with the same sample size as the original data set.}
+
+{\bf I don't know what he means on this problem. Are we supposed to basically re-do 4 but with the mean only model?}
 
 \begin{itemize}
 \item%6a
 {\it For the parametric test, the p-value can be extracted from the ``lm"  model ``summary"'s using ``summary(model1)$coef[2,4]".}
+
+<<prob6a>>=
+resid.var <- summary(lm.Year)$sigma^2
+
+rand.noise <- rnorm(10000,0,resid.var)
+@
 
 \item%6b
 {\it It is best and easiest if you do one loop for the simulations and then for each simulated data set in each loop generate the three test results, extracting the p-values that each produces. If you struggle to set this up, please send me an email or stop by with an attempt at your code for some feedback.}
@@ -182,14 +199,15 @@ In class we derived that the variance at a given time point, Var($y_{t}$) = Cov(
 
 White Noise Variance = $\sigma^2$
 
-$\sigma^2_{0.03}$ = $\frac{##}{1-0.03}  = \frac{##}{0.97} = ##$
+$\sigma^2_{0.03}$ = $\frac{\Sexpr{resid.var}}{1-0.03}  = \frac{\Sexpr{resid.var}{0.97} = 0.0012$
 
-$\sigma^2_{0.06}$ = $\frac{##}{1-0.06}  = \frac{##}{0.94} = ##$
+$\sigma^2_{0.06}$ = $\frac{\Sexpr{resid.var}}{1-0.06}  = \frac{\Sexpr{resid.var}}{0.94} = 0.0011$
 
 \item%7b
 {\it To simulate the process we can use this value in the ``arima.sim" function in something like ``arima.sim(n=2000,list(ar=c(0.3)),sd=5)" where ``n=2000" provides 2000 simulated observations, ``model=list(ar=c(0.3))" determines that we are using an AR(1) process with parameter of of 0.3, and ``sd=5" controls the SD of the normal white noise used to build the AR(1) process (this is {\bf not} the variance of the AR(1) process). Check that you get about your expected results using something like:}
 
-\end{enumerate}
+{\bf I must be doing something wrong, these are completely off.}
+
 
 <<prob7b, warning=F,message=F, include=FALSE>>=
 ar1sim<-arima.sim(n=2000,model=list(ar=c(0.6)),sd=5)
@@ -200,15 +218,35 @@ var(ar1sim)
 
 @
 
+\end{enumerate}
+
 \item%8
 {\it Repeat your simulation study of the parametric, permutation, and Theil-Sen linear trend test based on the CI. Report the estimated Type I error rates in the presence of AR(1) correlations with a parameter of 0.6 based on your work in the previous question for simulating the response time series. Discuss the impacts of having autocorrelation present on the various procedures.}
 
 \item%9
 {\it The Zhang method you read about is also available in the ``zyp" package but it only provides confidence intervals and I am not completely convinced by their discussion of the intervals provided without more exploration. But you can get estimates from ``zyp.sen" and confidence intervals using ``confint.zyp" on the results from ``zyp.sen". The ``confint" function can also be applied to ``mblm" results. Find and compare the two confidence intervals for the Sen-estimators for the proportion response time series. No simulation study here - just complete the analysis.}
 
+The 95\% confidence interval using {\texttt confint(mblm.object)} was (\Sexpr{CI[1]}, \Sexpr{CI[2]}).
+The 95\% confidence interval using {\texttt zyp.confint(zyp.sen.object)} was (\Sexpr{CI.zyp[1]}, \Sexpr{CI.zyp[2]}).
+
+The widths are nearly the same, but the {\texttt confint(mblm())} confidence interval is shifted up slightly compared to the {\texttt zyp.confint()} confidence interval.
+
+<<prob9>>=
+zyp.Year <- zyp.sen(PropDays ~ Year, data = Data1)
+
+CI.zyp <- confint.zyp(zyp.Year)[2,]
+@
+
 
 \item%10
 {\it Make a plot of the original proportion response time series with the parametric linear, Theil-Sen, and Zhang methods$/$models on the same plot. You may want to use \verbatim{$plot(y~x,type="l")$} and then add lines to the plot.}
+
+<<prob10>>=
+plot(PropDays ~ lm.year$Residuals, data = Data1, type = "l")
+
+
+
+@
 
 
 \end{enumerate}
