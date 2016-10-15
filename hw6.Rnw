@@ -65,6 +65,14 @@ ggplot(data = Data1, aes(x = Year, y = PropDays)) + geom_point() + scale_x_conti
 \item%2
 {\it Estimate a linear trend model for the proportion of measured days below freezing and report the parametric (t-test) linear trend test results in a sentence. Also discuss scope of inference for this test in a sentence or two (random sampling and random assignment and their implications).}
 
+<<prob2>>=
+lm.Year <- lm(PropDays ~ Year, data = Data1)
+@
+
+The true mean proportion of days below freezing was associated with a decrease of \Sexpr{coef(lm.Year)[2]} days per year in these years recorded at the spots in Bozeman data were collected.
+
+Data were taken through an observational study and years were not randomly chosen, which is why we stated the conclusion using the wording ``associated" and ``in these years recorded at the spots in Bozeman data were collected". %as we teach our students to do...
+
 \item%3
 {\it Discuss this proportion response versus using the count of days below zero per year, specific to this example and in general. What issues does using one or the other present?}
 
@@ -80,8 +88,6 @@ lm_year.b <- NULL
 for(i in 1:10000){
   lm[i] <- coef(lm(Data1$PropDays ~ shuffle(Data1$Year)))[2]
   }
-
-lm.Year <- lm(PropDays ~ Year, data = Data1)
 
 hist(lm, main = "Histogram of 10000 Permutations of \n Year and Resulting \n LM Slope Coefficients", xlab = expression(beta[Year]), ylab = "Count")
 abline(v = coef(lm.Year)[2], col = "purple")
@@ -108,7 +114,6 @@ The Normal Q-Q plot shows some slight deviations from normality in the tails. If
 
 
 <<prob5,warning=F,message=F, cache = TRUE>>=
-require(mblm)
 model1s<-mblm(PropDays~Year,data=Data1,repeated=F)
 model1s.coef <- coef(model1s)[2]
 
@@ -129,10 +134,6 @@ pvalue.mblm <- length(c(which(mblm.coeff<=model1s.coef), which(mblm.coeff>=-mode
 
 pvalue.mblm.save <- 0.3476
 
-
-
-
-confint(model1s)
 CI<-confint(model1s)[2,] #Extract CI and check whether 0 is in interval
 #(0>CI[1])&(0<CI[2]) #If 0 is in interval, FTR H0
 
@@ -209,7 +210,7 @@ $\sigma^2_{0.06}$ = $\frac{\Sexpr{resid.var}}{1-0.06}  = \frac{\Sexpr{resid.var}
 {\bf I must be doing something wrong, these are completely off.}
 
 
-<<prob7b, warning=F,message=F, include=FALSE>>=
+<<prob7b, warning=F,message=F, results = 'hide'>>=
 ar1sim<-arima.sim(n=2000,model=list(ar=c(0.6)),sd=5)
 var(ar1sim)
 
@@ -226,35 +227,73 @@ var(ar1sim)
 \item%9
 {\it The Zhang method you read about is also available in the ``zyp" package but it only provides confidence intervals and I am not completely convinced by their discussion of the intervals provided without more exploration. But you can get estimates from ``zyp.sen" and confidence intervals using ``confint.zyp" on the results from ``zyp.sen". The ``confint" function can also be applied to ``mblm" results. Find and compare the two confidence intervals for the Sen-estimators for the proportion response time series. No simulation study here - just complete the analysis.}
 
+<<prob9>>=
+zyp.Year <- zyp.sen(PropDays ~ Year, data = Data1)
+
+CI.zyp <- c(confint.zyp(zyp.Year)[2,])
+@
+
+
+
 The 95\% confidence interval using {\texttt confint(mblm.object)} was (\Sexpr{CI[1]}, \Sexpr{CI[2]}).
 The 95\% confidence interval using {\texttt zyp.confint(zyp.sen.object)} was (\Sexpr{CI.zyp[1]}, \Sexpr{CI.zyp[2]}).
 
 The widths are nearly the same, but the {\texttt confint(mblm())} confidence interval is shifted up slightly compared to the {\texttt zyp.confint()} confidence interval.
 
-<<prob9>>=
-zyp.Year <- zyp.sen(PropDays ~ Year, data = Data1)
-
-CI.zyp <- confint.zyp(zyp.Year)[2,]
-@
-
 
 \item%10
 {\it Make a plot of the original proportion response time series with the parametric linear, Theil-Sen, and Zhang methods$/$models on the same plot. You may want to use \verbatim{$plot(y~x,type="l")$} and then add lines to the plot.}
 
+Estimates from all three functions visually are very similar.
+
+
 <<prob10>>=
-plot(PropDays ~ lm.year$Residuals, data = Data1, type = "l")
-
-
+plot(PropDays ~ Year, data = Data1, type = "l", ylim = c(0,1), ylab = expression('Proportion of Days Below 32' *~degree*F))
+abline(lm.Year)
+abline(model1s, col = "purple", add = TRUE)
+abline(a = zyp.Year$coefficients[1], b = zyp.Year$coefficients[2], col = "red")
 
 @
 
 
-\end{enumerate}
 
-\section*{References}
+\end{enumerate}
 
 \appendix
 \section*{R Code}
+
+\begin{enumerate}
+
+\setcounter{enumi}{3}
+\item%1
+<<prob1, echo = TRUE, eval = FALSE>>=
+@
+\item%2
+<<prob2, echo = TRUE, eval = FALSE>>=
+@
+\addtocounter{enumii}{2}
+<<prob4, echo = TRUE, eval = FALSE>>=
+@
+<<prob4x, echo = TRUE, eval = FALSE>>=
+@
+\item%5
+<<prob5, echo = TRUE, eval = FALSE>>=
+@
+\item%6
+<<prob6a, echo = TRUE, eval = FALSE>>=
+@
+\item%7
+<<prob7b, echo = TRUE, eval = FALSE>>=
+@
+\addtocounter{enumii}{2}
+\item%9
+<<prob9, echo = TRUE, eval = FALSE>>=
+@
+\item
+<<prob10, echo = TRUE, eval = FALSE>>=
+@
+
+\end{enumerate}
 
 
 \end{document}
