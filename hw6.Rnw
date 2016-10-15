@@ -30,7 +30,7 @@ library(xtable)
 library(mosaic)#shuffle
 library(mblm)#sen
 options(xtable.table.placement = "H", xtable.caption.placement = "top",
-        width = 80, scipen = 1, show.signif.stars = FALSE)
+        #width = 80, scipen = 1, show.signif.stars = FALSE)
 @
 
 {\it We will explore one series like those you found in the Vincent and Meki's paper, but for Bozeman. The following code will count the days in Bozeman where the minimum temperature was measured to be below 32 degrees F (0 degrees C) and the number of days where information was available in ``Data1". }
@@ -106,31 +106,47 @@ The Normal Q-Q plot shows some slight deviations from normality in the tails. If
 {\bf What does he mean by ``and its permutation test"? -- AM}
 
 
-<<prob5,warning=F,message=F>>=
+<<prob5,warning=F,message=F, cache = TRUE>>=
 require(mblm)
 model1s<-mblm(PropDays~Year,data=Data1,repeated=F)
+model1s.coef <- coef(model1s)[2]
 
 year <- data.frame(replicate(10000, shuffle(Data1$Year)))
 year$pdays <- Data1$PropDays
 shuffled.frame <- data.frame(pdays = year$pdays)
 mblm.mod <- NULL
 mblm.coeff <- numeric(10000)
-mblm.mod <- lapply(1:5, function(i){
+mblm.mod <- lapply(1:10000, function(i){
   shuffled.frame$year <- year[,i]
   return(mblm(pdays~year, data=shuffled.frame,repeated = F))
 })
 # Excercise for Andrea!
-#mblm.coeff[i] <- coef(mblm.mod)[2]
+# level of difficulty: 1 (after seeing mblm.mod of course ;) 
+mblm.coeff <- sapply(mblm.mod, function(x){coef(x)[2]})
 
-s1 <- NULL
-s1$year <- shuffle(Data1$Year)
-s1$pdays <- Data1$PropDays
-mblm(pdays~year, data = s1, repeated = F)
+pvalue.mblm <- length(c(which(mblm.coeff<=model1s.coef), which(mblm.coeff>=-model1s.coef)))/length(mblm.coeff)
 
-summary(model1s)
+
 confint(model1s)
 CI<-confint(model1s)[2,] #Extract CI and check whether 0 is in interval
 (0>CI[1])&(0<CI[2]) #If 0 is in interval, FTR H0
+
+confint(mblm.mod[[1]])[2,]
+
+fn.confint <- function(x){
+  confint(x)[2,]
+}
+
+out <- mblm.mod[[1]]
+
+dec.mblm <- c(rep(0,10000))
+
+#took about 3-4 hours to run
+for(i in 1:10000){
+  dec.mblm[i] <- ifelse(confint(mblm.mod[[i]])[2,1]<0 & confint(mblm.mod[[i]])[2,2]>=0, "R", "FTR")
+}
+
+pvalue.mblm <- length(which(as.factor(dec.mblm) == "R"))/length(dec.mblm)
 @
 
 {\texttt lm()} gave an estimated slope coefficeint of \Sexpr{coef(lm.Year)[2]} and {\texttt mblm()} gave an estimated slope coefficient of \Sexpr{coef(model1s)[2]}.
