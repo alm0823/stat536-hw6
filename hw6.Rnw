@@ -132,7 +132,6 @@ mblm.coeff <- sapply(mblm.mod, function(x){coef(x)[2]})
 
 pvalue.mblm <- length(c(which(mblm.coeff<=model1s.coef), which(mblm.coeff>=-model1s.coef)))/length(mblm.coeff)
 
-pvalue.mblm.save <- 0.3476
 
 CI<-confint(model1s)[2,] #Extract CI and check whether 0 is in interval
 #(0>CI[1])&(0<CI[2]) #If 0 is in interval, FTR H0
