@@ -267,7 +267,8 @@ if(file.exists("prob6p.Rdata")){
 lm.perm_type1 <- mean(lm.perm.pvals < 0.05)
 
 
-# Note: We could combine these three simulations and have parSapply return a matrix of reject/not reject outcomes
+# Note: We could combine these three simulations and have parSapply return a
+# matrix of reject/not reject outcomes
 @
 
 lm $t$-test type I error rate: \Sexpr{lm.noise_type1}
@@ -444,11 +445,13 @@ Estimates from all three functions visually are very similar.
 
 
 <<prob10>>=
-plot(PropDays ~ Year, data = Data1, type = "l", ylim = c(0,1), ylab = expression('Proportion of Days Below 32' *~degree*F))
-abline(lm.Year)
-abline(model1s, col = "purple")
-abline(a = zyp.Year$coefficients[1], b = zyp.Year$coefficients[2], col = "red")
-
+plot(PropDays ~ Year, data = Data1, type = "l", ylim = c(0,1),
+     ylab = expression('Proportion of Days Below 32' *~degree*F))
+abline(lm.Year, lwd = 2)
+abline(model1s, col = "purple", lty = 2, lwd = 2)
+abline(a = zyp.Year$coefficients[1], b = zyp.Year$coefficients[2], col = "red", lty = 3, lwd = 2)
+legend("topright", lwd = 2, lty = 1:3, col = c("black", "purple", "red"),
+       legend = c("OLS", "Sen", "Zhang"))
 @
 
 
@@ -466,7 +469,7 @@ abline(a = zyp.Year$coefficients[1], b = zyp.Year$coefficients[2], col = "red")
 \item%2
 <<prob2, echo = TRUE, eval = FALSE>>=
 @
-\addtocounter{enumii}{2}
+\addtocounter{enumi}{1}
 \item%4
 <<prob4, echo = TRUE, eval = FALSE>>=
 @
@@ -478,7 +481,7 @@ abline(a = zyp.Year$coefficients[1], b = zyp.Year$coefficients[2], col = "red")
 <<prob5, echo = TRUE, eval = FALSE>>=
 @
 \item%6
-<<prob6a, echo = TRUE, eval = FALSE>>=
+<<prob6, echo = TRUE, eval = FALSE>>=
 @
 \item%7
 <<prob7b, echo = TRUE, eval = FALSE>>=

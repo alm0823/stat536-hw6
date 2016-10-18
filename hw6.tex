@@ -333,7 +333,7 @@ Estimates from all three functions visually are very similar.
 \end{alltt}
 \end{kframe}
 \end{knitrout}
-\addtocounter{enumii}{2}
+\addtocounter{enumi}{1}
 \item%4
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
@@ -414,7 +414,85 @@ Estimates from all three functions visually are very similar.
 \end{kframe}
 \end{knitrout}
 \item%6
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# first is lm}
 
+\hlstd{rand.noise} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwd{replicate}\hlstd{(}\hlnum{10000}\hlstd{,} \hlkwd{rnorm}\hlstd{(}\hlnum{109}\hlstd{,} \hlnum{0}\hlstd{, resid.se)))}
+\hlcom{#dim(rand.noise)# 109 rows}
+
+\hlkwa{if}\hlstd{(}\hlkwd{file.exists}\hlstd{(}\hlstr{"prob6t.Rdata"}\hlstd{))\{}
+  \hlkwd{load}\hlstd{(}\hlstr{"prob6t.Rdata"}\hlstd{)}
+\hlstd{\}}\hlkwa{else}\hlstd{\{}
+  \hlstd{cl} \hlkwb{<-} \hlkwd{makeCluster}\hlstd{(}\hlkwd{detectCores}\hlstd{())}
+  \hlkwd{clusterExport}\hlstd{(cl,} \hlkwd{c}\hlstd{(}\hlstr{"Data1"}\hlstd{))}
+  \hlstd{lm.noise} \hlkwb{<-} \hlkwd{parCapply}\hlstd{(cl, rand.noise,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
+    \hlcom{# Get the pvalues!}
+    \hlkwd{return}\hlstd{(}\hlkwd{summary}\hlstd{(}\hlkwd{lm}\hlstd{(x} \hlopt{~} \hlstd{Year,} \hlkwc{data} \hlstd{= Data1))}\hlopt{$}\hlstd{coefficients[}\hlstr{"Year"}\hlstd{,}\hlstr{"Pr(>|t|)"}\hlstd{])}
+  \hlstd{\})}
+  \hlkwd{stopCluster}\hlstd{(cl)}
+  \hlkwd{save}\hlstd{(lm.noise,} \hlkwc{file} \hlstd{=} \hlstr{"prob6t.Rdata"}\hlstd{)}
+\hlstd{\}}
+
+\hlcom{# Get proportion with small pvalues}
+\hlstd{lm.noise_type1} \hlkwb{<-} \hlkwd{mean}\hlstd{(lm.noise} \hlopt{<} \hlnum{0.05}\hlstd{)}
+
+
+\hlcom{# next is mblm}
+
+\hlstd{noise.frame} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{Year} \hlstd{= Data1}\hlopt{$}\hlstd{Year,} \hlkwc{out} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlkwd{as.numeric}\hlstd{(}\hlnum{NA}\hlstd{),} \hlnum{109}\hlstd{))}
+
+\hlkwa{if}\hlstd{(}\hlkwd{file.exists}\hlstd{(}\hlstr{"prob6m.Rdata"}\hlstd{))\{}
+  \hlkwd{load}\hlstd{(}\hlstr{"prob6m.Rdata"}\hlstd{)}
+\hlstd{\}}\hlkwa{else}\hlstd{\{}
+  \hlstd{cl} \hlkwb{<-} \hlkwd{makeCluster}\hlstd{(}\hlkwd{detectCores}\hlstd{())}
+  \hlkwd{clusterExport}\hlstd{(cl,} \hlkwd{c}\hlstd{(}\hlstr{"Data1"}\hlstd{,} \hlstr{"noise.frame"}\hlstd{,} \hlstr{"mblm"}\hlstd{))}
+  \hlstd{mblm.noise.reject} \hlkwb{<-} \hlkwd{parCapply}\hlstd{(cl, rand.noise,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
+    \hlstd{noise.frame}\hlopt{$}\hlstd{out} \hlkwb{<-} \hlstd{x}
+    \hlcom{# Is this where we use the CIs?}
+    \hlstd{CI}\hlkwb{<-}\hlkwd{confint}\hlstd{(}\hlkwd{mblm}\hlstd{(out}\hlopt{~}\hlstd{Year,} \hlkwc{data}\hlstd{=noise.frame,}\hlkwc{repeated} \hlstd{= F))[}\hlnum{2}\hlstd{,]}
+    \hlkwd{return}\hlstd{((}\hlnum{0} \hlopt{<} \hlstd{CI[}\hlnum{1}\hlstd{])} \hlopt{|} \hlstd{(}\hlnum{0} \hlopt{>} \hlstd{CI[}\hlnum{2}\hlstd{]))} \hlcom{# Is 0 outside the CI?}
+  \hlstd{\})}
+  \hlkwd{stopCluster}\hlstd{(cl)}
+  \hlkwd{save}\hlstd{(mblm.noise.reject,} \hlkwc{file} \hlstd{=} \hlstr{"prob6m.Rdata"}\hlstd{)}
+\hlstd{\}}
+
+\hlcom{# Get proportion with 0 outside the interval}
+\hlstd{mblm.noise_type1} \hlkwb{<-} \hlkwd{mean}\hlstd{(mblm.noise.reject)}
+
+
+\hlcom{# finally the permutation test}
+
+\hlkwa{if}\hlstd{(}\hlkwd{file.exists}\hlstd{(}\hlstr{"prob6p.Rdata"}\hlstd{))\{}
+  \hlkwd{load}\hlstd{(}\hlstr{"prob6p.Rdata"}\hlstd{)}
+\hlstd{\}}\hlkwa{else}\hlstd{\{}
+  \hlstd{cl} \hlkwb{<-} \hlkwd{makeCluster}\hlstd{(}\hlkwd{detectCores}\hlstd{())}
+  \hlkwd{clusterExport}\hlstd{(cl,} \hlkwd{c}\hlstd{(}\hlstr{"Data1"}\hlstd{,} \hlstr{"shuffle"}\hlstd{))}
+  \hlcom{# Loop for each simulated noise vector}
+  \hlstd{lm.perm.pvals} \hlkwb{<-} \hlkwd{parCapply}\hlstd{(cl, rand.noise[,}\hlnum{1}\hlopt{:}\hlnum{1000}\hlstd{],} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
+    \hlcom{# Get the "observed result" from fitting the ith dataset}
+    \hlstd{lm.slope} \hlkwb{<-} \hlkwd{coef}\hlstd{(}\hlkwd{lm}\hlstd{(x} \hlopt{~} \hlstd{Year,} \hlkwc{data} \hlstd{= Data1))[}\hlnum{2}\hlstd{]}
+
+    \hlcom{# Now loop to make a permutation distribution using this sim and suffled years}
+    \hlstd{lm.perms} \hlkwb{<-} \hlkwd{replicate}\hlstd{(}\hlnum{1000}\hlstd{,} \hlkwd{coef}\hlstd{(}\hlkwd{lm}\hlstd{(x} \hlopt{~} \hlkwd{shuffle}\hlstd{(Year),} \hlkwc{data} \hlstd{= Data1))[}\hlnum{2}\hlstd{])}
+
+    \hlcom{# Return pvalue}
+    \hlkwd{return}\hlstd{(}\hlkwd{mean}\hlstd{(}\hlkwd{abs}\hlstd{(lm.slope)} \hlopt{>} \hlkwd{abs}\hlstd{(lm.perms)))}
+  \hlstd{\})}
+  \hlkwd{stopCluster}\hlstd{(cl)}
+  \hlkwd{save}\hlstd{(lm.perm.pvals,} \hlkwc{file} \hlstd{=} \hlstr{"prob6p.Rdata"}\hlstd{)}
+\hlstd{\}}
+
+\hlcom{# Get proportion with small pvalues}
+\hlstd{lm.perm_type1} \hlkwb{<-} \hlkwd{mean}\hlstd{(lm.perm.pvals} \hlopt{<} \hlnum{0.05}\hlstd{)}
+
+
+\hlcom{# Note: We could combine these three simulations and have parSapply return a}
+\hlcom{# matrix of reject/not reject outcomes}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
 \item%7
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
@@ -519,10 +597,13 @@ Estimates from all three functions visually are very similar.
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
 \begin{alltt}
-\hlkwd{plot}\hlstd{(PropDays} \hlopt{~} \hlstd{Year,} \hlkwc{data} \hlstd{= Data1,} \hlkwc{type} \hlstd{=} \hlstr{"l"}\hlstd{,} \hlkwc{ylim} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{),} \hlkwc{ylab} \hlstd{=} \hlkwd{expression}\hlstd{(}\hlstr{'Proportion of Days Below 32'} \hlopt{*~}\hlstd{degree}\hlopt{*}\hlstd{F))}
-\hlkwd{abline}\hlstd{(lm.Year)}
-\hlkwd{abline}\hlstd{(model1s,} \hlkwc{col} \hlstd{=} \hlstr{"purple"}\hlstd{)}
-\hlkwd{abline}\hlstd{(}\hlkwc{a} \hlstd{= zyp.Year}\hlopt{$}\hlstd{coefficients[}\hlnum{1}\hlstd{],} \hlkwc{b} \hlstd{= zyp.Year}\hlopt{$}\hlstd{coefficients[}\hlnum{2}\hlstd{],} \hlkwc{col} \hlstd{=} \hlstr{"red"}\hlstd{)}
+\hlkwd{plot}\hlstd{(PropDays} \hlopt{~} \hlstd{Year,} \hlkwc{data} \hlstd{= Data1,} \hlkwc{type} \hlstd{=} \hlstr{"l"}\hlstd{,} \hlkwc{ylim} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{),}
+     \hlkwc{ylab} \hlstd{=} \hlkwd{expression}\hlstd{(}\hlstr{'Proportion of Days Below 32'} \hlopt{*~}\hlstd{degree}\hlopt{*}\hlstd{F))}
+\hlkwd{abline}\hlstd{(lm.Year,} \hlkwc{lwd} \hlstd{=} \hlnum{2}\hlstd{)}
+\hlkwd{abline}\hlstd{(model1s,} \hlkwc{col} \hlstd{=} \hlstr{"purple"}\hlstd{,} \hlkwc{lty} \hlstd{=} \hlnum{2}\hlstd{,} \hlkwc{lwd} \hlstd{=} \hlnum{2}\hlstd{)}
+\hlkwd{abline}\hlstd{(}\hlkwc{a} \hlstd{= zyp.Year}\hlopt{$}\hlstd{coefficients[}\hlnum{1}\hlstd{],} \hlkwc{b} \hlstd{= zyp.Year}\hlopt{$}\hlstd{coefficients[}\hlnum{2}\hlstd{],} \hlkwc{col} \hlstd{=} \hlstr{"red"}\hlstd{,} \hlkwc{lty} \hlstd{=} \hlnum{3}\hlstd{,} \hlkwc{lwd} \hlstd{=} \hlnum{2}\hlstd{)}
+\hlkwd{legend}\hlstd{(}\hlstr{"topright"}\hlstd{,} \hlkwc{lwd} \hlstd{=} \hlnum{2}\hlstd{,} \hlkwc{lty} \hlstd{=} \hlnum{1}\hlopt{:}\hlnum{3}\hlstd{,} \hlkwc{col} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"black"}\hlstd{,} \hlstr{"purple"}\hlstd{,} \hlstr{"red"}\hlstd{),}
+       \hlkwc{legend} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"OLS"}\hlstd{,} \hlstr{"Sen"}\hlstd{,} \hlstr{"Zhang"}\hlstd{))}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
