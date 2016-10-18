@@ -1,4 +1,4 @@
-\documentclass[11pt]{article}
+drea\documentclass[11pt]{article}
 \usepackage{fullpage,graphicx,float,amsmath,enumitem,hyperref}
 \setlist{parsep=5.5pt}
 \setlength{\parindent}{0pt}
@@ -22,8 +22,7 @@ library(knitr)
 opts_chunk$set(echo = FALSE, comment = NA, fig.align = "center",
                fig.width = 6.5, fig.height = 4, fig.pos = "H",
                size = "footnotesize", dev = "pdf",
-               dev.args = list(pointsize = 11),
-               cache = TRUE)
+               dev.args = list(pointsize = 11))
 knit_theme$set("print")
 
 library(ggplot2)
@@ -47,12 +46,14 @@ Bozeman<-read.csv("Bozeman.csv",header=T)
 monthsF<-sort(unique(Bozeman$MonthRE))
 countfun<-function(x) c(sum(x<32),sum(!is.na(x)))
 
-  monthcountMINF<-aggregate(Bozeman$TMIN..F.,by=list(Bozeman$MonthRE),FUN=countfun)
-  yearcountMINF<-aggregate(Bozeman$TMIN..F.,by=list(Bozeman$Year),FUN=countfun)
+monthcountMINF<-aggregate(Bozeman$TMIN..F.,by=list(Bozeman$MonthRE),FUN=countfun)
+yearcountMINF<-aggregate(Bozeman$TMIN..F.,by=list(Bozeman$Year),FUN=countfun)
+
+Data1<-data.frame(Year=yearcountMINF[,1],DaysBelow32=yearcountMINF$x[,1],
+                  MeasuredDays=yearcountMINF$x[,2],
+                  PropDays=yearcountMINF$x[,1]/yearcountMINF$x[,2])
   
-  Data1<-data.frame(Year=yearcountMINF[,1],DaysBelow32=yearcountMINF$x[,1],MeasuredDays=yearcountMINF$x[,2],PropDays=yearcountMINF$x[,1]/yearcountMINF$x[,2])
-  
-  head(Data1)
+head(Data1)
 @
 \begin{enumerate}
 
@@ -60,11 +61,21 @@ countfun<-function(x) c(sum(x<32),sum(!is.na(x)))
 {\it Make nice looking and labeled time series plots of the number of days below freezing and the proportion of measured days below freezing.}
 
 <<prob1>>=
- ggplot(data = Data1, aes(x = Year, y = DaysBelow32)) + geom_point() + scale_x_continuous(breaks = c(seq(min(as.numeric(Data1$Year)),max(as.numeric(Data1$Year))+5, by = 5))) + scale_y_continuous(breaks = c(seq(min(as.numeric(Data1$DaysBelow32)),max(as.numeric(Data1$DaysBelow32))+5, by = 10))) + theme_bw() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + labs(title = 'Bozeman Weather Data') + ylab(expression('Days Below 32' *~degree*F))
+ ggplot(data = Data1, aes(x = Year, y = DaysBelow32)) + geom_point() +
+  scale_x_continuous(breaks = c(seq(min(as.numeric(Data1$Year)),max(as.numeric(Data1$Year))+5, by = 5))) +
+  scale_y_continuous(breaks = c(seq(min(as.numeric(Data1$DaysBelow32)),max(as.numeric(Data1$DaysBelow32))+5, by = 10))) +
+  theme_bw() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = 'Bozeman Weather Data') +
+  ylab(expression('Days Below 32' *~degree*F))
   
-ggplot(data = Data1, aes(x = Year, y = PropDays)) + geom_point() + scale_x_continuous(breaks = c(seq(min(as.numeric(Data1$Year)),max(as.numeric(Data1$Year))+5, by = 5))) + scale_y_continuous(limits = c(0,1), breaks = c(seq(0,1, by = 0.1))) + theme_bw() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + labs(title = 'Bozeman Weather Data') + ylab(expression('Proportion of Days Below 32' *~degree*F))
+ggplot(data = Data1, aes(x = Year, y = PropDays)) + geom_point() +
+  scale_x_continuous(breaks = c(seq(min(as.numeric(Data1$Year)),max(as.numeric(Data1$Year))+5, by = 5))) +
+  scale_y_continuous(limits = c(0,1), breaks = c(seq(0,1, by = 0.1))) +
+  theme_bw() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = 'Bozeman Weather Data') +
+  ylab(expression('Proportion of Days Below 32' *~degree*F))
 
-  @
+@
 
 
 \item%2
@@ -88,21 +99,30 @@ Specific in to these data, temperature was not recorded every day of each year.T
 {\it Generate a permutation test for the trend with the proportion response. I performed one in the syllabus (page 6) using the ``shuffle" function from the ``mosaic" package. Report a plot of the permutation distribution, the {\bf test statistic} you used, and a p-value. Generally randomization based tests are more robust to violations of the normality assumption as long as the distribution (shape and variability) is the same for all observations except for differences in the {\it center} or mean. Why would that be advantageous with this response?}
 
 <<prob4, dependson = "prob2">>=
-# Run in parallel.
-# Note: Most guidelines say don't use more than half of your CPU cores but whatevs...
-cl <- makeCluster(detectCores())
-clusterExport(cl, c("Data1", "shuffle")) # Load Data1 and mosaic::shuffle() on the nodes
-lm_perm <- parSapply(cl, seq_len(10000), function(i){ # seq_len(10000) is the same as 1:10000
-  return(coef(lm(Data1$PropDays ~ shuffle(Data1$Year)))[2])
-})
-stopCluster(cl) # Stop this cluster and start with a clean environment next time
+# I don't trust knitr's caching so I'm saving things manually.
+if(file.exists("prob4.Rdata")){
+  load("prob4.Rdata")
+}else{
+  # Run in parallel.
+  # Note: Most guidelines say don't use more than half of your CPU cores but whatevs...
+  cl <- makeCluster(detectCores())
+  clusterExport(cl, c("Data1", "shuffle")) # Load Data1 and mosaic::shuffle() on the nodes
+  lm_perm <- parSapply(cl, seq_len(10000), function(i){ # seq_len(10000) is the same as 1:10000
+    return(coef(lm(Data1$PropDays ~ shuffle(Data1$Year)))[2])
+  })
+  stopCluster(cl) # Stop this cluster and start with a clean environment next time
+
+  save(lm_perm, file = "prob4.Rdata")
+}
 @
 
 <<prob4o, dependson = "prob4">>=
-hist(lm_perm, main = "Histogram of 10000 Permutations of \n Year and Resulting \n LM Slope Coefficients", xlab = expression(beta[Year]), ylab = "Count", breaks = 50)
+hist(lm_perm, main = "Histogram of 10000 Permutations of \n Year and Resulting \n LM Slope Coefficients",
+     xlab = expression(beta[Year]), ylab = "Count", breaks = 50)
 abline(v = coef(lm.Year)[2], col = "purple")
 
-perm_pvalue <- (length(which(lm_perm<=coef(lm.Year)[2])) + length(which(lm_perm>=-coef(lm.Year)[2])))/length(lm_perm)
+perm_pvalue <- (length(which(lm_perm<=coef(lm.Year)[2])) + length(which(lm_perm>=-coef(lm.Year)[2]))) /
+  length(lm_perm)
 @
 
 $H_{o}$: $\beta_{Year}$ = 0
@@ -130,19 +150,25 @@ model1s.coef <- coef(model1s)[2]
 year <- data.frame(replicate(10000, shuffle(Data1$Year)))
 shuffled.frame <- data.frame(pdays = Data1$PropDays, suffled.year = rep(as.numeric(NA), 109))
 
-cl <- makeCluster(detectCores())
-clusterExport(cl, c("Data1", "shuffled.frame", "mblm"))
-mblm.mod <- parCapply(cl, year, function(x){
-  shuffled.frame$year <- x
-  return(mblm(pdays~year, data=shuffled.frame,repeated = F))
-})
-stopCluster(cl)
+if(file.exists("prob5.Rdata")){
+  load("prob5.Rdata")
+}else{
+  cl <- makeCluster(detectCores())
+  clusterExport(cl, c("Data1", "shuffled.frame", "mblm"))
+  mblm.mod <- parCapply(cl, year, function(x){
+    shuffled.frame$year <- x
+    return(mblm(pdays~year, data=shuffled.frame,repeated = F))
+  })
+  stopCluster(cl)
+  save(mblm.mod, file = "prob5.Rdata")
+}
 
 # Excercise for Andrea!
 # level of difficulty: 1 (after seeing mblm.mod of course ;) 
 mblm.coeff <- sapply(mblm.mod, function(x){coef(x)[2]})
 
-pvalue.mblm <- length(c(which(mblm.coeff<=model1s.coef), which(mblm.coeff>=-model1s.coef)))/length(mblm.coeff)
+pvalue.mblm <- length(c(which(mblm.coeff<=model1s.coef), which(mblm.coeff>=-model1s.coef))) /
+  length(mblm.coeff)
 
 
 CI<-confint(model1s)[2,] #Extract CI and check whether 0 is in interval
@@ -174,19 +200,18 @@ I assume we use $\alpha=0.05$?
 rand.noise <- data.frame(replicate(10000, rnorm(109, 0, resid.se)))
 #dim(rand.noise)# 109 rows
 
-cl <- makeCluster(detectCores())
-clusterExport(cl, c("Data1"))
-lm.noise <- parCapply(cl, rand.noise, function(x){
-  # Get the pvalues!
-  return(summary(lm(x ~ Year, data = Data1))$coefficients["Year","Pr(>|t|)"])
-})
-stopCluster(cl)
-
-#lm.noise_type1 <- (length(which(lm.noise<=coef(lm.Year)[2])) + length(which(lm.noise>=-coef(lm.Year)[2])))/length(lm.noise)
-
-#summary(lm.noise[1])$coef[2,4]
-
-# Above is not the type I error rate, I  don't know how to get it
+if(file.exists("prob6t.Rdata")){
+  load("prob6t.Rdata")
+}else{
+  cl <- makeCluster(detectCores())
+  clusterExport(cl, c("Data1"))
+  lm.noise <- parCapply(cl, rand.noise, function(x){
+    # Get the pvalues!
+    return(summary(lm(x ~ Year, data = Data1))$coefficients["Year","Pr(>|t|)"])
+  })
+  stopCluster(cl)
+  save(lm.noise, file = "prob6t.Rdata")
+}
 
 # Get proportion with small pvalues
 lm.noise_type1 <- mean(lm.noise < 0.05)
@@ -195,15 +220,21 @@ lm.noise_type1 <- mean(lm.noise < 0.05)
 # next is mblm
 
 noise.frame <- data.frame(Year = Data1$Year, out = rep(as.numeric(NA), 109))
-cl <- makeCluster(detectCores())
-clusterExport(cl, c("Data1", "rand.noise", "noise.frame", "mblm"))
-mblm.noise.reject <- parCapply(cl, rand.noise, function(x){
-  noise.frame$out <- x
-  # Is this where we use the CIs?
-  CI<-confint(mblm(out~Year, data=noise.frame,repeated = F))[2,]
-  return((0 < CI[1]) | (0 > CI[2])) # Is 0 in the CI?
-})
-stopCluster(cl)
+
+if(file.exists("prob6m.Rdata")){
+  load("prob6m.Rdata")
+}else{
+  cl <- makeCluster(detectCores())
+  clusterExport(cl, c("Data1", "noise.frame", "mblm"))
+  mblm.noise.reject <- parCapply(cl, rand.noise, function(x){
+    noise.frame$out <- x
+    # Is this where we use the CIs?
+    CI<-confint(mblm(out~Year, data=noise.frame,repeated = F))[2,]
+    return((0 < CI[1]) | (0 > CI[2])) # Is 0 outside the CI?
+  })
+  stopCluster(cl)
+  save(mblm.noise.reject, file = "prob6m.Rdata")
+}
 
 # Get proportion with 0 outside the interval
 mblm.noise_type1 <- mean(mblm.noise.reject)
@@ -211,20 +242,25 @@ mblm.noise_type1 <- mean(mblm.noise.reject)
 
 # finally the permutation test
 
-cl <- makeCluster(detectCores())
-clusterExport(cl, c("Data1", "shuffle"))
-# Loop for each simulated noise vector
-lm.perm.pvals <- parCapply(cl, rand.noise[,1:1000], function(x){
-  # Get the "observed result" from fitting the ith dataset
-  lm.slope <- coef(lm(x ~ Year, data = Data1))[2]
+if(file.exists("prob6p.Rdata")){
+  load("prob6p.Rdata")
+}else{
+  cl <- makeCluster(detectCores())
+  clusterExport(cl, c("Data1", "shuffle"))
+  # Loop for each simulated noise vector
+  lm.perm.pvals <- parCapply(cl, rand.noise[,1:1000], function(x){
+    # Get the "observed result" from fitting the ith dataset
+    lm.slope <- coef(lm(x ~ Year, data = Data1))[2]
 
-  # Now loop to make a permutation distribution using this sim and suffled years
-  lm.perms <- replicate(1000, coef(lm(x ~ shuffle(Year), data = Data1))[2])
+    # Now loop to make a permutation distribution using this sim and suffled years
+    lm.perms <- replicate(1000, coef(lm(x ~ shuffle(Year), data = Data1))[2])
 
-  # Return pvalue
-  return(mean(abs(lm.slope) > abs(lm.perms)))
-})
-stopCluster(cl)
+    # Return pvalue
+    return(mean(abs(lm.slope) > abs(lm.perms)))
+  })
+  stopCluster(cl)
+  save(lm.perm.pvals, file = "prob6p.Rdata")
+}
 
 # Get proportion with small pvalues
 lm.perm_type1 <- mean(lm.perm.pvals < 0.05)
@@ -286,21 +322,102 @@ $$\sigma^2_{0.6} = (1-0.3^2) \Sexpr{resid.se^2} = \Sexpr{(1-0.6^2) * resid.se^2}
 {\bf I must be doing something wrong, these are completely off.}
 
 
-<<prob7b, dependson = "prob2">>=
+<<prob7b, echo = TRUE, dependson = "prob2">>=
 sig3 <- sqrt((1-0.3^2)) * resid.se
 sig6 <- sqrt((1-0.6^2)) * resid.se
 
 ar1sim<-arima.sim(n=2000,model=list(ar=c(0.3)),sd=sig3)
-sd(ar1sim)
+var(ar1sim)
 
 ar1sim<-arima.sim(n=2000,model=list(ar=c(0.6)),sd=sig6)
-sd(ar1sim) # about right :)
+var(ar1sim) # about right :)
 @
+
+Variance of $y_t$ using $\phi=0.6$ = \Sexpr{var(ar1sim)}
+
+Residual variance from lm fit = \Sexpr{resid.se^2}
 
 \end{enumerate}
 
 \item%8
 {\it Repeat your simulation study of the parametric, permutation, and Theil-Sen linear trend test based on the CI. Report the estimated Type I error rates in the presence of AR(1) correlations with a parameter of 0.6 based on your work in the previous question for simulating the response time series. Discuss the impacts of having autocorrelation present on the various procedures.}
+
+<<prob8, dependson = "prob7b">>=
+# first is lm
+
+rand.ar1 <- data.frame(replicate(10000, arima.sim(n=109,model=list(ar=c(0.6)),sd=sig6)))
+
+if(file.exists("prob8t.Rdata")){
+  load("prob8t.Rdata")
+}else{
+  cl <- makeCluster(detectCores())
+  clusterExport(cl, c("Data1"))
+  lm.ar1 <- parCapply(cl, rand.ar1, function(x){
+    # Get the pvalues!
+    return(summary(lm(x ~ Year, data = Data1))$coefficients["Year","Pr(>|t|)"])
+  })
+  stopCluster(cl)
+  save(lm.ar1, file = "prob8t.Rdata")
+}
+
+# Get proportion with small pvalues
+lm.ar1_type1 <- mean(lm.ar1 < 0.05)
+
+
+# next is mblm
+
+ar1.frame <- data.frame(Year = Data1$Year, out = rep(as.numeric(NA), 109))
+
+if(file.exists("prob8m.Rdata")){
+  load("prob8m.Rdata")
+}else{
+  cl <- makeCluster(detectCores())
+  clusterExport(cl, c("Data1", "ar1.frame", "mblm"))
+  mblm.ar1.reject <- parCapply(cl, rand.ar1, function(x){
+    ar1.frame$out <- x
+    # Is this where we use the CIs?
+    CI<-confint(mblm(out~Year, data=ar1.frame,repeated = F))[2,]
+    return((0 < CI[1]) | (0 > CI[2])) # Is 0 outside the CI?
+  })
+  stopCluster(cl)
+  save(mblm.ar1.reject, file = "prob8m.Rdata")
+}
+
+# Get proportion with 0 outside the interval
+mblm.ar1_type1 <- mean(mblm.ar1.reject)
+
+
+# finally the permutation test
+
+if(file.exists("prob8p.Rdata")){
+  load("prob8p.Rdata")
+}else{
+  cl <- makeCluster(detectCores())
+  clusterExport(cl, c("Data1", "shuffle"))
+  # Loop for each simulated noise vector
+  lm.ar1.perm <- parCapply(cl, rand.ar1[,1:1000], function(x){
+    # Get the "observed result" from fitting the ith dataset
+    lm.slope <- coef(lm(x ~ Year, data = Data1))[2]
+
+    # Now loop to make a permutation distribution using this sim and suffled years
+    lm.perms <- replicate(1000, coef(lm(x ~ shuffle(Year), data = Data1))[2])
+
+    # Return pvalue
+    return(mean(abs(lm.slope) > abs(lm.ar1.perm)))
+  })
+  stopCluster(cl)
+  save(lm.ar1.perm, file = "prob6p.Rdata")
+}
+
+# Get proportion with small pvalues
+lm.ar1.perm_type1 <- mean(lm.ar1.perm < 0.05)
+@
+
+lm $t$-test type I error rate: \Sexpr{lm.ar1_type1}
+
+mblm CI type I error rate: \Sexpr{mblm.ar1_type1}
+
+lm permutation test type I error rate: \Sexpr{lm.ar1.perm_type1}
 
 \item%9
 {\it The Zhang method you read about is also available in the ``zyp" package but it only provides confidence intervals and I am not completely convinced by their discussion of the intervals provided without more exploration. But you can get estimates from ``zyp.sen" and confidence intervals using ``confint.zyp" on the results from ``zyp.sen". The ``confint" function can also be applied to ``mblm" results. Find and compare the two confidence intervals for the Sen-estimators for the proportion response time series. No simulation study here - just complete the analysis.}
@@ -325,7 +442,7 @@ The widths are nearly the same, but the {\texttt confint(mblm())} confidence int
 Estimates from all three functions visually are very similar.
 
 
-<<prob10>>=
+<<prob10, dependson = "prob9">>=
 plot(PropDays ~ Year, data = Data1, type = "l", ylim = c(0,1), ylab = expression('Proportion of Days Below 32' *~degree*F))
 abline(lm.Year)
 abline(model1s, col = "purple")
@@ -342,7 +459,6 @@ abline(a = zyp.Year$coefficients[1], b = zyp.Year$coefficients[2], col = "red")
 
 \begin{enumerate}
 
-\setcounter{enumi}{3}
 \item%1
 <<prob1, echo = TRUE, eval = FALSE>>=
 @
@@ -350,6 +466,7 @@ abline(a = zyp.Year$coefficients[1], b = zyp.Year$coefficients[2], col = "red")
 <<prob2, echo = TRUE, eval = FALSE>>=
 @
 \addtocounter{enumii}{2}
+\item%4
 <<prob4, echo = TRUE, eval = FALSE>>=
 @
 <<prob4o, echo = TRUE, eval = FALSE>>=
@@ -365,7 +482,9 @@ abline(a = zyp.Year$coefficients[1], b = zyp.Year$coefficients[2], col = "red")
 \item%7
 <<prob7b, echo = TRUE, eval = FALSE>>=
 @
-\addtocounter{enumii}{2}
+\item%8
+<<prob8, echo = TRUE, eval = FALSE>>=
+@
 \item%9
 <<prob9, echo = TRUE, eval = FALSE>>=
 @
