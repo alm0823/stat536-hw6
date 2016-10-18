@@ -130,7 +130,7 @@ $H_{o}$: $\beta_{Year}$ = 0
 
 $H_{a}$: $\beta_{Year} \neq$ 0
 
-Based on 10000 permutations, the resulted in a pvalue of 0.0019, from a test statistic of \ensuremath{-0.0003}, which is also the estimated slope from a model with the observed data.
+Based on 10000 permutations, the resulted in a pvalue of 0.0022, from a test statistic of \ensuremath{-0.0003}, which is also the estimated slope from a model with the observed data.
 
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}
@@ -154,7 +154,7 @@ The Normal Q-Q plot shows some slight deviations from normality in the tails. If
 
 {\texttt lm()} gave an estimated slope coefficeint of \ensuremath{-0.0003117} and {\texttt mblm()} gave an estimated slope coefficient of \ensuremath{-0.0003161}.
 
-Using the same hypotheses from 4, but with the {\texttt mblm()} function fitting the model with the median response, the permutation test based on 10,000 iterations led to a pvalue of 0 using the test statistic of the observed slope coefficient (\ensuremath{-0.0003161}) and the null hypothesis of no relationship between year and temperature. The explicit hypotheses are stated below. There is strong evidence that year had an effect on median temperature in these data. 
+Using the same hypotheses from 4, but with the {\texttt mblm()} function fitting the model with the median response, the permutation test based on 10,000 iterations led to a pvalue of 0.0023 using the test statistic of the observed slope coefficient (\ensuremath{-0.0003161}) and the null hypothesis of no relationship between year and temperature. The explicit hypotheses are stated below. There is strong evidence that year had an effect on median temperature in these data. 
 $H_{o}$: $\beta_{Year.median}$ = 0
 
 $H_{a}$: $\beta_{Year.median} \neq$ 0
@@ -173,11 +173,11 @@ I assume we use $\alpha=0.05$?
 
 
 
-lm $t$-test type I error rate: 0.1
+lm $t$-test type I error rate: 0.0516
 
-mblm CI type I error rate: 0
+mblm CI type I error rate: 0.0557
 
-lm permutation test type I error rate: 0.2
+lm permutation test type I error rate: 0.068
 
 {\bf Re-do everything, but with the random noise responses rather than the obesrved data.}
 
@@ -211,7 +211,7 @@ In class we derived that the variance at a given time point, Var($y_{t}$) = Cov(
 
 White Noise Variance = $\sigma^2$
 
-In problem 2, we observed a residual variance of 0.0010413, so $0.0010413 = \frac{\sigma^2}{1-\phi^2}$. Solving for $\sigma^2$, the white noise variance is
+In problem 2, we observed a residual variance of 0.0010413, so $0.0010413 = \dfrac{\sigma^2}{1-\phi^2}$. Solving for $\sigma^2$, the white noise variance is
 $$
 \sigma^2 = (1-\phi^2) 0.0010413.
 $$
@@ -229,8 +229,8 @@ $$\sigma^2_{0.6} = (1-0.3^2) 0.0010413 = 0.0006664$$
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
 \begin{verbatim}
-[1] 0.03205374
-[1] 0.03125673
+[1] 0.03239275
+[1] 0.03323242
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -260,10 +260,7 @@ Estimates from all three functions visually are very similar.
 
 
 \begin{knitrout}\footnotesize
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-
-
-{\ttfamily\noindent\color{warningcolor}{Warning in int\_abline(a = a, b = b, h = h, v = v, untf = untf, ...): "{}add"{} is not a graphical parameter}}\end{kframe}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}
 
 {\centering \includegraphics[width=\maxwidth]{figure/prob10-1} 
 
@@ -342,14 +339,13 @@ Estimates from all three functions visually are very similar.
 \hlstd{model1s}\hlkwb{<-}\hlkwd{mblm}\hlstd{(PropDays}\hlopt{~}\hlstd{Year,}\hlkwc{data}\hlstd{=Data1,}\hlkwc{repeated}\hlstd{=F)}
 \hlstd{model1s.coef} \hlkwb{<-} \hlkwd{coef}\hlstd{(model1s)[}\hlnum{2}\hlstd{]}
 
-\hlstd{year} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwd{replicate}\hlstd{(}\hlnum{10}\hlstd{,} \hlkwd{shuffle}\hlstd{(Data1}\hlopt{$}\hlstd{Year)))}
+\hlstd{year} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwd{replicate}\hlstd{(}\hlnum{10000}\hlstd{,} \hlkwd{shuffle}\hlstd{(Data1}\hlopt{$}\hlstd{Year)))}
 \hlstd{shuffled.frame} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{pdays} \hlstd{= Data1}\hlopt{$}\hlstd{PropDays,} \hlkwc{suffled.year} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlkwd{as.numeric}\hlstd{(}\hlnum{NA}\hlstd{),} \hlnum{109}\hlstd{))}
-\hlstd{mblm.mod} \hlkwb{<-} \hlkwa{NULL}
 
 \hlstd{cl} \hlkwb{<-} \hlkwd{makeCluster}\hlstd{(}\hlkwd{detectCores}\hlstd{())}
-\hlkwd{clusterExport}\hlstd{(cl,} \hlkwd{c}\hlstd{(}\hlstr{"Data1"}\hlstd{,} \hlstr{"year"}\hlstd{,} \hlstr{"shuffled.frame"}\hlstd{,} \hlstr{"mblm"}\hlstd{))}
-\hlstd{mblm.mod} \hlkwb{<-} \hlkwd{parLapply}\hlstd{(cl,} \hlkwd{seq_len}\hlstd{(}\hlkwd{ncol}\hlstd{(year)),} \hlkwa{function}\hlstd{(}\hlkwc{i}\hlstd{)\{}
-  \hlstd{shuffled.frame}\hlopt{$}\hlstd{year} \hlkwb{<-} \hlstd{year[,i]}
+\hlkwd{clusterExport}\hlstd{(cl,} \hlkwd{c}\hlstd{(}\hlstr{"Data1"}\hlstd{,} \hlstr{"shuffled.frame"}\hlstd{,} \hlstr{"mblm"}\hlstd{))}
+\hlstd{mblm.mod} \hlkwb{<-} \hlkwd{parCapply}\hlstd{(cl, year,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
+  \hlstd{shuffled.frame}\hlopt{$}\hlstd{year} \hlkwb{<-} \hlstd{x}
   \hlkwd{return}\hlstd{(}\hlkwd{mblm}\hlstd{(pdays}\hlopt{~}\hlstd{year,} \hlkwc{data}\hlstd{=shuffled.frame,}\hlkwc{repeated} \hlstd{= F))}
 \hlstd{\})}
 \hlkwd{stopCluster}\hlstd{(cl)}
@@ -400,7 +396,7 @@ Estimates from all three functions visually are very similar.
 \begin{alltt}
 \hlkwd{plot}\hlstd{(PropDays} \hlopt{~} \hlstd{Year,} \hlkwc{data} \hlstd{= Data1,} \hlkwc{type} \hlstd{=} \hlstr{"l"}\hlstd{,} \hlkwc{ylim} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{),} \hlkwc{ylab} \hlstd{=} \hlkwd{expression}\hlstd{(}\hlstr{'Proportion of Days Below 32'} \hlopt{*~}\hlstd{degree}\hlopt{*}\hlstd{F))}
 \hlkwd{abline}\hlstd{(lm.Year)}
-\hlkwd{abline}\hlstd{(model1s,} \hlkwc{col} \hlstd{=} \hlstr{"purple"}\hlstd{,} \hlkwc{add} \hlstd{=} \hlnum{TRUE}\hlstd{)}
+\hlkwd{abline}\hlstd{(model1s,} \hlkwc{col} \hlstd{=} \hlstr{"purple"}\hlstd{)}
 \hlkwd{abline}\hlstd{(}\hlkwc{a} \hlstd{= zyp.Year}\hlopt{$}\hlstd{coefficients[}\hlnum{1}\hlstd{],} \hlkwc{b} \hlstd{= zyp.Year}\hlopt{$}\hlstd{coefficients[}\hlnum{2}\hlstd{],} \hlkwc{col} \hlstd{=} \hlstr{"red"}\hlstd{)}
 \end{alltt}
 \end{kframe}

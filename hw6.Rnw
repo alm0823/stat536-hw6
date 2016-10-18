@@ -209,17 +209,17 @@ stopCluster(cl)
 mblm.noise_type1 <- mean(mblm.noise.reject)
 
 
-# finally the permutation test, but I don't know what we should be testing
+# finally the permutation test
 
 cl <- makeCluster(detectCores())
 clusterExport(cl, c("Data1", "shuffle"))
 # Loop for each simulated noise vector
-lm.perm.pvals <- parCapply(cl, rand.noise, function(x){
+lm.perm.pvals <- parCapply(cl, rand.noise[,1:1000], function(x){
   # Get the "observed result" from fitting the ith dataset
   lm.slope <- coef(lm(x ~ Year, data = Data1))[2]
 
   # Now loop to make a permutation distribution using this sim and suffled years
-  lm.perms <- replicate(10000, coef(lm(x ~ shuffle(Year), data = Data1))[2])
+  lm.perms <- replicate(1000, coef(lm(x ~ shuffle(Year), data = Data1))[2])
 
   # Return pvalue
   return(mean(abs(lm.slope) > abs(lm.perms)))
