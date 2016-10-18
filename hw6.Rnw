@@ -129,7 +129,6 @@ model1s.coef <- coef(model1s)[2]
 
 year <- data.frame(replicate(10000, shuffle(Data1$Year)))
 shuffled.frame <- data.frame(pdays = Data1$PropDays, suffled.year = rep(as.numeric(NA), 109))
-mblm.mod <- NULL
 
 cl <- makeCluster(detectCores())
 clusterExport(cl, c("Data1", "year", "shuffled.frame", "mblm"))
@@ -198,7 +197,7 @@ lm.noise_type1 <- mean(lm.noise < 0.05)
 noise.frame <- data.frame(Year = Data1$Year, out = rep(as.numeric(NA), 109))
 cl <- makeCluster(detectCores())
 clusterExport(cl, c("Data1", "rand.noise", "noise.frame", "mblm"))
-mblm.noise.reject <- parSapply(cl, seq_len(ncol(noise.frame)), function(i){
+mblm.noise.reject <- parSapply(cl, seq_len(ncol(rand.noise)), function(i){
   noise.frame$out <- rand.noise[,i]
   # Is this where we use the CIs?
   CI<-confint(mblm(out~Year, data=noise.frame,repeated = F))[2,]
@@ -215,14 +214,14 @@ mblm.noise_type1 <- mean(mblm.noise.reject)
 cl <- makeCluster(detectCores())
 clusterExport(cl, c("Data1", "shuffle", "rand.noise"))
 # Loop for each simulated noise vector
-lm.perm.pvals <- parSapply(cl, seq_len(ncol(noise.frame)), function(i){
+lm.perm.pvals <- parSapply(cl, seq_len(ncol(rand.noise)), function(i){
   # Get the "observed result" from fitting the ith dataset
   lm.slope <- coef(lm(rand.noise[,i] ~ Year, data = Data1))[2]
 
   # Now loop to make a permutation distribution using this sim and suffled years
   lm.perms <- replicate(10000, coef(lm(rand.noise[,i] ~ shuffle(Year), data = Data1))[2])
 
-  # Return pvalues
+  # Return pvalue
   return(mean(abs(lm.slope) > abs(lm.perms)))
 })
 stopCluster(cl)
