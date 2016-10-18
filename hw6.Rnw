@@ -169,7 +169,7 @@ if(file.exists("prob5.Rdata")){
 }
 
 pvalue.mblm <- length(c(which(mblm.coeff<=model1s.coef), which(mblm.coeff>=-model1s.coef))) /
-  length(mblm.coeff)
+length(mblm.coeff)
 
 
 CI<-confint(model1s)[2,] #Extract CI and check whether 0 is in interval
@@ -404,10 +404,10 @@ if(file.exists("prob8p.Rdata")){
     lm.perms <- replicate(1000, coef(lm(x ~ shuffle(Year), data = Data1))[2])
 
     # Return pvalue
-    return(mean(abs(lm.slope) > abs(lm.ar1.perm)))
+    return(mean(abs(lm.slope) > abs(lm.perms)))
   })
   stopCluster(cl)
-  save(lm.ar1.perm, file = "prob6p.Rdata")
+  save(lm.ar1.perm, file = "prob8p.Rdata")
 }
 
 # Get proportion with small pvalues
