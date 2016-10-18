@@ -19,19 +19,24 @@
 
 <<setup, echo = FALSE, message = FALSE, cache = FALSE>>=
 library(knitr)
-#opts_chunk$set(echo = FALSE, comment = NA, fig.align = "center",
-               #fig.width = 6.5, fig.height = 4, fig.pos = "H",
-               #size = "footnotesize", dev = "pdf",
-               #dev.args = list(pointsize = 11))
-#knit_theme$set("print")
+opts_chunk$set(echo = FALSE, comment = NA, fig.align = "center",
+               fig.width = 6.5, fig.height = 4, fig.pos = "H",
+               size = "footnotesize", dev = "pdf",
+               dev.args = list(pointsize = 11),
+               cache = TRUE)
+knit_theme$set("print")
 
 library(ggplot2)
 library(xtable)
 library(mosaic)#shuffle
 library(mblm)#sen
 library(zyp)#zhang
-#options(xtable.table.placement = "H", xtable.caption.placement = "top",
-        #width = 80, scipen = 1, show.signif.stars = FALSE)
+options(xtable.table.placement = "H", xtable.caption.placement = "top",
+        width = 80, scipen = 1, show.signif.stars = FALSE)
+
+library(parallel)#multithreading
+
+set.seed(987233) # So we get the same permutations every time
 @
 
 {\it We will explore one series like those you found in the Vincent and Meki's paper, but for Bozeman. The following code will count the days in Bozeman where the minimum temperature was measured to be below 32 degrees F (0 degrees C) and the number of days where information was available in ``Data1". }
@@ -65,8 +70,9 @@ ggplot(data = Data1, aes(x = Year, y = PropDays)) + geom_point() + scale_x_conti
 \item%2
 {\it Estimate a linear trend model for the proportion of measured days below freezing and report the parametric (t-test) linear trend test results in a sentence. Also discuss scope of inference for this test in a sentence or two (random sampling and random assignment and their implications).}
 
-<<prob2>>=
+<<prob2, dependson = "readin">>=
 lm.Year <- lm(PropDays ~ Year, data = Data1)
+resid.se <- summary(lm.Year)$sigma # Save this for later
 @
 
 The true mean proportion of days below freezing was associated with a decrease of \Sexpr{coef(lm.Year)[2]} days per year in these years recorded at the spots in Bozeman data were collected.
@@ -81,18 +87,22 @@ Specific in to these data, temperature was not recorded every day of each year.T
 \item%4
 {\it Generate a permutation test for the trend with the proportion response. I performed one in the syllabus (page 6) using the ``shuffle" function from the ``mosaic" package. Report a plot of the permutation distribution, the {\bf test statistic} you used, and a p-value. Generally randomization based tests are more robust to violations of the normality assumption as long as the distribution (shape and variability) is the same for all observations except for differences in the {\it center} or mean. Why would that be advantageous with this response?}
 
-<<prob4>>=
-lm <- numeric(10000)
-lm_year.b <- NULL
+<<prob4, dependson = "prob2">>=
+# Run in parallel.
+# Note: Most guidelines say don't use more than half of your CPU cores but whatevs...
+cl <- makeCluster(detectCores())
+clusterExport(cl, c("Data1", "shuffle")) # Load Data1 and mosaic::shuffle() on the nodes
+lm_perm <- parSapply(cl, seq_len(10000), function(i){ # seq_len(10000) is the same as 1:10000
+  return(coef(lm(Data1$PropDays ~ shuffle(Data1$Year)))[2])
+})
+stopCluster(cl) # Stop this cluster and start with a clean environment next time
+@
 
-for(i in 1:10000){
-  lm[i] <- coef(lm(Data1$PropDays ~ shuffle(Data1$Year)))[2]
-  }
-
-hist(lm, main = "Histogram of 10000 Permutations of \n Year and Resulting \n LM Slope Coefficients", xlab = expression(beta[Year]), ylab = "Count")
+<<prob4o, dependson = "prob4">>=
+hist(lm_perm, main = "Histogram of 10000 Permutations of \n Year and Resulting \n LM Slope Coefficients", xlab = expression(beta[Year]), ylab = "Count", breaks = 50)
 abline(v = coef(lm.Year)[2], col = "purple")
 
-perm_pvalue <- (length(which(lm<=coef(lm.Year)[2])) + length(which(lm>=-coef(lm.Year)[2])))/length(lm)
+perm_pvalue <- (length(which(lm_perm<=coef(lm.Year)[2])) + length(which(lm_perm>=-coef(lm.Year)[2])))/length(lm_perm)
 @
 
 $H_{o}$: $\beta_{Year}$ = 0
@@ -101,7 +111,7 @@ $H_{a}$: $\beta_{Year} \neq$ 0
 
 Based on 10000 permutations, the resulted in a pvalue of \Sexpr{perm_pvalue}, from a test statistic of \Sexpr{round(coef(lm.Year)[2],4)}, which is also the estimated slope from a model with the observed data.
 
-<<prob4x>>=
+<<prob4x, dependson = "prob4">>=
 par(mfrow=c(1,1))
 plot(lm.Year, which = 2)
 @
@@ -113,19 +123,22 @@ The Normal Q-Q plot shows some slight deviations from normality in the tails. If
 {\bf What does he mean by ``and its permutation test"? -- AM}
 
 
-<<prob5,warning=F,message=F, cache = TRUE>>=
+<<prob5, dependson = "readin">>=
 model1s<-mblm(PropDays~Year,data=Data1,repeated=F)
 model1s.coef <- coef(model1s)[2]
 
 year <- data.frame(replicate(10000, shuffle(Data1$Year)))
-year$pdays <- Data1$PropDays
-shuffled.frame <- data.frame(pdays = year$pdays)
+shuffled.frame <- data.frame(pdays = Data1$PropDays, suffled.year = rep(as.numeric(NA), 109))
 mblm.mod <- NULL
-mblm.coeff <- numeric(10000)
-mblm.mod <- lapply(1:10000, function(i){
+
+cl <- makeCluster(detectCores())
+clusterExport(cl, c("Data1", "year", "shuffled.frame", "mblm"))
+mblm.mod <- parLapply(cl, seq_len(ncol(year)), function(i){
   shuffled.frame$year <- year[,i]
   return(mblm(pdays~year, data=shuffled.frame,repeated = F))
 })
+stopCluster(cl)
+
 # Excercise for Andrea!
 # level of difficulty: 1 (after seeing mblm.mod of course ;) 
 mblm.coeff <- sapply(mblm.mod, function(x){coef(x)[2]})
@@ -135,17 +148,6 @@ pvalue.mblm <- length(c(which(mblm.coeff<=model1s.coef), which(mblm.coeff>=-mode
 
 CI<-confint(model1s)[2,] #Extract CI and check whether 0 is in interval
 #(0>CI[1])&(0<CI[2]) #If 0 is in interval, FTR H0
-
-dec.mblm <- c(rep(0,10000))
-
-#took about 3-4 hours to run
-#for(i in 1:10000){
-  #dec.mblm[i] <- ifelse(confint(mblm.mod[[i]])[2,1]<0 & confint(mblm.mod[[i]])[2,2]>=0, "R", "FTR")
-#}
-
-cl.mblm.confint <- length(which(as.factor(dec.mblm) == "R"))/length(dec.mblm)
-
-cl.mblm.confint.save <- 0.3476
 @
 
 {\texttt lm()} gave an estimated slope coefficeint of \Sexpr{coef(lm.Year)[2]} and {\texttt mblm()} gave an estimated slope coefficient of \Sexpr{coef(model1s)[2]}.
@@ -155,51 +157,94 @@ $H_{o}$: $\beta_{Year.median}$ = 0
 
 $H_{a}$: $\beta_{Year.median} \neq$ 0
 
-It is estimated that the median temperature in this data set decreased by \Sexpr{coef(model1s)[2]} $\degrees$F each year with an associated 95\% confidence interval of \Sexpr{CI[1]} to \Sexpr{CI[2]} $\degrees$F.
+It is estimated that the median temperature in this data set decreased by \Sexpr{coef(model1s)[2]} $^\circ$F each year with an associated 95\% confidence interval of \Sexpr{CI[1]} to \Sexpr{CI[2]} $^\circ$F.
 
-However, I would question the validity of the confidence level set using {\texttt confint()} on an {\texttt mblm()} object. If there was strong evidence of an effect of temperature, at the 95\% confidence level, we would expect to ``reject" 5\% of the time, meaning that approximately 5\% of confidence intervals, in the long run, should contain 0. We ran 10,000 simulations and \Sexpr{cl.mblm.confint*100}\% contained 0. Something is wrong.
+However, I would question the validity of the confidence level set using {\texttt confint()} on an {\texttt mblm()} object. If there was strong evidence of an effect of temperature, at the 95\% confidence level, we would expect to ``reject" 5\% of the time, meaning that approximately 5\% of confidence intervals, in the long run, should contain 0.
 
 
 \item%6
 {\it Use the residual error variance estimate from your linear model for the proportion responses to simulate a series with no trend (constant mean and you can leave it at 0) and normal white noise with that same variance. Use that simulation code to perform a simulation study of the Type I error rate for the parametric t-test for the slope coefficient, the test using the confidence interval from ``mblm", and your permutation test (use 500 permutations and do 250 simulations to keep the run time somewhat manageable). Report the simulation-based Type I error rates when using a 5\% significance level test for the three procedures with the same sample size as the original data set.}
 
-{\bf I don't understand what the permutation test is for. I can do a permutation test, but I don' t know what he wants us to test.}
+I assume we use $\alpha=0.05$?
 
-<<prob6>>=
+{\bf I don't understand what the permutation test is for. I can do a permutation test, but I don' t know what he wants us to test.} \emph{We're evalauating the Type I error rate of the permutation test on fake data with no trend.}
 
+<<prob6, dependson = "prob2">>=
 # first is lm
-resid.se <- summary(lm.Year)$sigma
 
-rand.noise <- data.frame(replicate(1000, rnorm(109,0,resid.se)))
-dim(rand.noise)
-lm.noise <- lapply(1:1000, function(x){lm(rand.noise[,x] ~ Data1$Year)})
+rand.noise <- data.frame(replicate(10000, rnorm(109, 0, resid.se)))
+#dim(rand.noise)# 109 rows
 
-lm.noise_type1 <- (length(which(lm.noise<=coef(lm.Year)[2])) + length(which(lm.noise>=-coef(lm.Year)[2])))/length(lm.noise)
+cl <- makeCluster(detectCores())
+clusterExport(cl, c("Data1", "rand.noise"))
+lm.noise <- parSapply(cl, seq_len(ncol(rand.noise)), function(x){
+  # Get the pvalues!
+  return(summary(lm(rand.noise[,x] ~ Year, data = Data1))$coefficients["Year","Pr(>|t|)"])
+})
+stopCluster(cl)
 
-summary(lm.noise[1])$coef[2,4]
+#lm.noise_type1 <- (length(which(lm.noise<=coef(lm.Year)[2])) + length(which(lm.noise>=-coef(lm.Year)[2])))/length(lm.noise)
+
+#summary(lm.noise[1])$coef[2,4]
 
 # Above is not the type I error rate, I  don't know how to get it
 
-# next is mblm
-rand.noise$Year <- Data1$Year
+# Get proportion with small pvalues
+lm.noise_type1 <- mean(lm.noise < 0.05)
 
-noise.frame <- data.frame(Year = Data1$Year)
-mblm.noise <- NULL
-mblm.coeff.noise <- numeric(1000)
-mblm.noise <- lapply(1:1000, function(i){
+
+# next is mblm
+
+noise.frame <- data.frame(Year = Data1$Year, out = rep(as.numeric(NA), 109))
+cl <- makeCluster(detectCores())
+clusterExport(cl, c("Data1", "rand.noise", "noise.frame", "mblm"))
+mblm.noise.reject <- parSapply(cl, seq_len(ncol(noise.frame)), function(i){
   noise.frame$out <- rand.noise[,i]
-  return(mblm(out~Year, data=noise.frame,repeated = F))
+  # Is this where we use the CIs?
+  CI<-confint(mblm(out~Year, data=noise.frame,repeated = F))[2,]
+  return((0 < CI[1]) | (0 > CI[2])) # Is 0 in the CI?
 })
+stopCluster(cl)
+
+# Get proportion with 0 outside the interval
+mblm.noise_type1 <- mean(mblm.noise.reject)
+
 
 # finally the permutation test, but I don't know what we should be testing
 
+cl <- makeCluster(detectCores())
+clusterExport(cl, c("Data1", "shuffle", "rand.noise"))
+# Loop for each simulated noise vector
+lm.perm.pvals <- parSapply(cl, seq_len(ncol(noise.frame)), function(i){
+  # Get the "observed result" from fitting the ith dataset
+  lm.slope <- coef(lm(rand.noise[,i] ~ Year, data = Data1))[2]
+
+  # Now loop to make a permutation distribution using this sim and suffled years
+  lm.perms <- replicate(10000, coef(lm(rand.noise[,i] ~ shuffle(Year), data = Data1))[2])
+
+  # Return pvalues
+  return(mean(abs(lm.slope) > abs(lm.perms)))
+})
+stopCluster(cl)
+
+# Get proportion with small pvalues
+lm.perm_type1 <- mean(lm.perm.pvals < 0.05)
+
+
+# Note: We could combine these three simulations and have parSapply return a matrix of reject/not reject outcomes
 @
+
+lm $t$-test type I error rate: \Sexpr{lm.noise_type1}
+
+mblm CI type I error rate: \Sexpr{mblm.noise_type1}
+
+lm permutation test type I error rate: \Sexpr{lm.perm_type1}
 
 {\bf Re-do everything, but with the random noise responses rather than the obesrved data.}
 
 \begin{itemize}
 \item%6a
-{\it For the parametric test, the p-value can be extracted from the ``lm"  model ``summary"'s using ``summary(model1)$coef[2,4]".}
+{\it For the parametric test, the p-value can be extracted from the ``lm"  model ``summary"'s using ``summary(model1)\$coef[2,4]".}
 
 
 
@@ -216,7 +261,7 @@ mblm.noise <- lapply(1:1000, function(i){
 
 Let $\phi^{k}$ = the correlation between observations taken k time points apart (k lags apart), such that for time points 0 units apart, $\phi^{0}$ = 1.
 
-In class we derived that the variance at a given time point, Var($y_{t}$) = Cov($y_{t}$,$y_{t}$) = $\frac{\sigma^2_{e}}{(1-\phi^2)$}.
+In class we derived that the variance at a given time point, Var($y_{t}$) = Cov($y_{t}$,$y_{t}$) = $\frac{\sigma^2_{e}}{(1-\phi^2)}$.
 
 
 \begin{enumerate}
@@ -227,9 +272,14 @@ In class we derived that the variance at a given time point, Var($y_{t}$) = Cov(
 
 White Noise Variance = $\sigma^2$
 
-$\sigma^2_{0.03}$ = $\frac{\Sexpr{resid.se^2}}{1-0.03}  = \frac{\Sexpr{resid.var}{0.97} = 0.0012$
-
-$\sigma^2_{0.06}$ = $\frac{\Sexpr{resid.se^2}}{1-0.06}  = \frac{\Sexpr{resid.var}}{0.94} = 0.0011$
+In problem 2, we observed a residual variance of \Sexpr{resid.se^2}, so $\Sexpr{resid.se^2} = \dfrac{\sigma^2}{1-\phi^2}$. Solving for $\sigma^2$, the white noise variance is
+$$
+\sigma^2 = (1-\phi^2) \Sexpr{resid.se^2}.
+$$
+Now plugging in $\phi=0.3$ and $\phi=0.6$, we get
+$$\sigma^2_{0.3} = (1-0.3^2) \Sexpr{resid.se^2} = \Sexpr{(1-0.3^2) * resid.se^2}$$
+and
+$$\sigma^2_{0.6} = (1-0.3^2) \Sexpr{resid.se^2} = \Sexpr{(1-0.6^2) * resid.se^2}$$
 
 \item%7b
 {\it To simulate the process we can use this value in the ``arima.sim" function in something like ``arima.sim(n=2000,list(ar=c(0.3)),sd=5)" where ``n=2000" provides 2000 simulated observations, ``model=list(ar=c(0.3))" determines that we are using an AR(1) process with parameter of of 0.3, and ``sd=5" controls the SD of the normal white noise used to build the AR(1) process (this is {\bf not} the variance of the AR(1) process). Check that you get about your expected results using something like:}
@@ -237,15 +287,15 @@ $\sigma^2_{0.06}$ = $\frac{\Sexpr{resid.se^2}}{1-0.06}  = \frac{\Sexpr{resid.var
 {\bf I must be doing something wrong, these are completely off.}
 
 
-<<prob7b, warning=F,message=F, results = 'hide'>>=
-#change sd to make squared residual se
+<<prob7b, dependson = "prob2">>=
+sig3 <- sqrt((1-0.3^2)) * resid.se
+sig6 <- sqrt((1-0.6^2)) * resid.se
 
-ar1sim<-arima.sim(n=2000,model=list(ar=c(0.6)),sd=5)
-var(ar1sim)
+ar1sim<-arima.sim(n=2000,model=list(ar=c(0.3)),sd=sig3)
+sd(ar1sim)
 
-ar1sim<-arima.sim(n=2000,model=list(ar=c(0.3)),sd=5)
-var(ar1sim)
-
+ar1sim<-arima.sim(n=2000,model=list(ar=c(0.6)),sd=sig6)
+sd(ar1sim) # about right :)
 @
 
 \end{enumerate}
@@ -256,7 +306,7 @@ var(ar1sim)
 \item%9
 {\it The Zhang method you read about is also available in the ``zyp" package but it only provides confidence intervals and I am not completely convinced by their discussion of the intervals provided without more exploration. But you can get estimates from ``zyp.sen" and confidence intervals using ``confint.zyp" on the results from ``zyp.sen". The ``confint" function can also be applied to ``mblm" results. Find and compare the two confidence intervals for the Sen-estimators for the proportion response time series. No simulation study here - just complete the analysis.}
 
-<<prob9>>=
+<<prob9, dependson = "prob2">>=
 zyp.Year <- zyp.sen(PropDays ~ Year, data = Data1)
 
 CI.zyp <- c(confint.zyp(zyp.Year)[2,])
@@ -271,7 +321,7 @@ The widths are nearly the same, but the {\texttt confint(mblm())} confidence int
 
 
 \item%10
-{\it Make a plot of the original proportion response time series with the parametric linear, Theil-Sen, and Zhang methods$/$models on the same plot. You may want to use \verbatim{$plot(y~x,type="l")$} and then add lines to the plot.}
+{\it Make a plot of the original proportion response time series with the parametric linear, Theil-Sen, and Zhang methods$/$models on the same plot. You may want to use \verb|plot(y~x,type="l")| and then add lines to the plot.}
 
 Estimates from all three functions visually are very similar.
 
@@ -279,7 +329,7 @@ Estimates from all three functions visually are very similar.
 <<prob10>>=
 plot(PropDays ~ Year, data = Data1, type = "l", ylim = c(0,1), ylab = expression('Proportion of Days Below 32' *~degree*F))
 abline(lm.Year)
-abline(model1s, col = "purple", add = TRUE)
+abline(model1s, col = "purple")
 abline(a = zyp.Year$coefficients[1], b = zyp.Year$coefficients[2], col = "red")
 
 @
@@ -302,6 +352,8 @@ abline(a = zyp.Year$coefficients[1], b = zyp.Year$coefficients[2], col = "red")
 @
 \addtocounter{enumii}{2}
 <<prob4, echo = TRUE, eval = FALSE>>=
+@
+<<prob4o, echo = TRUE, eval = FALSE>>=
 @
 <<prob4x, echo = TRUE, eval = FALSE>>=
 @
