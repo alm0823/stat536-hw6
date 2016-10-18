@@ -1,4 +1,54 @@
-\documentclass[11pt]{article}
+\documentclass[11pt]{article}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0, 0, 0}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.4,0.4,0.4}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{\textbf{#1}}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0,0,0}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0,0,0}{\textbf{#1}}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0,0,0}{\textbf{#1}}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0,0,0}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
 \usepackage{fullpage,graphicx,float,amsmath,enumitem,hyperref}
 \setlist{parsep=5.5pt}
 \setlength{\parindent}{0pt}
@@ -13,16 +63,11 @@
 \title{Time Series HW 6}
 \author{Kenny Flagg \\ Andrea Mack}
 \date{October 18, 2016}
-
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document}
 \maketitle
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error: <text>:15:0: unexpected end of input\\\#\# 13: options(xtable.table.placement = "{}H"{}, xtable.caption.placement = "{}top"{},\\\#\# 14:\ \ \ \ \ \ \ \  \#width = 80, scipen = 1, show.signif.stars = FALSE)\\\#\#\ \ \ \ \textasciicircum{}}}\end{kframe}
-\end{knitrout}
 
 {\it We will explore one series like those you found in the Vincent and Meki's paper, but for Bozeman. The following code will count the days in Bozeman where the minimum temperature was measured to be below 32 degrees F (0 degrees C) and the number of days where information was available in ``Data1". }
 
@@ -32,34 +77,31 @@
 \item%1
 {\it Make nice looking and labeled time series plots of the number of days below freezing and the proportion of measured days below freezing.}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
- \hlkwd{ggplot}\hlstd{(}\hlkwc{data} \hlstd{= Data1,} \hlkwd{aes}\hlstd{(}\hlkwc{x} \hlstd{= Year,} \hlkwc{y} \hlstd{= DaysBelow32))} \hlopt{+} \hlkwd{geom_point}\hlstd{()} \hlopt{+} \hlkwd{scale_x_continuous}\hlstd{(}\hlkwc{breaks} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{seq}\hlstd{(}\hlkwd{min}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{Year)),}\hlkwd{max}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{Year))}\hlopt{+}\hlnum{5}\hlstd{,} \hlkwc{by} \hlstd{=} \hlnum{5}\hlstd{)))} \hlopt{+} \hlkwd{scale_y_continuous}\hlstd{(}\hlkwc{breaks} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{seq}\hlstd{(}\hlkwd{min}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{DaysBelow32)),}\hlkwd{max}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{DaysBelow32))}\hlopt{+}\hlnum{5}\hlstd{,} \hlkwc{by} \hlstd{=} \hlnum{10}\hlstd{)))} \hlopt{+} \hlkwd{theme_bw}\hlstd{()} \hlopt{+} \hlkwd{theme}\hlstd{(}\hlkwc{axis.text.x} \hlstd{=} \hlkwd{element_text}\hlstd{(}\hlkwc{angle} \hlstd{=} \hlnum{45}\hlstd{,} \hlkwc{hjust} \hlstd{=} \hlnum{1}\hlstd{))} \hlopt{+} \hlkwd{labs}\hlstd{(}\hlkwc{title} \hlstd{=} \hlstr{'Bozeman Weather Data'}\hlstd{)} \hlopt{+} \hlkwd{ylab}\hlstd{(}\hlkwd{expression}\hlstd{(}\hlstr{'Days Below 32'} \hlopt{*~}\hlstd{degree}\hlopt{*}\hlstd{F))}
-\end{alltt}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}
+
+{\centering \includegraphics[width=\maxwidth]{figure/prob1-1} 
+
+}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): could not find function "{}ggplot"{}}}\begin{alltt}
-\hlkwd{ggplot}\hlstd{(}\hlkwc{data} \hlstd{= Data1,} \hlkwd{aes}\hlstd{(}\hlkwc{x} \hlstd{= Year,} \hlkwc{y} \hlstd{= PropDays))} \hlopt{+} \hlkwd{geom_point}\hlstd{()} \hlopt{+} \hlkwd{scale_x_continuous}\hlstd{(}\hlkwc{breaks} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{seq}\hlstd{(}\hlkwd{min}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{Year)),}\hlkwd{max}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{Year))}\hlopt{+}\hlnum{5}\hlstd{,} \hlkwc{by} \hlstd{=} \hlnum{5}\hlstd{)))} \hlopt{+} \hlkwd{scale_y_continuous}\hlstd{(}\hlkwc{limits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{),} \hlkwc{breaks} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{seq}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{,} \hlkwc{by} \hlstd{=} \hlnum{0.1}\hlstd{)))} \hlopt{+} \hlkwd{theme_bw}\hlstd{()} \hlopt{+} \hlkwd{theme}\hlstd{(}\hlkwc{axis.text.x} \hlstd{=} \hlkwd{element_text}\hlstd{(}\hlkwc{angle} \hlstd{=} \hlnum{45}\hlstd{,} \hlkwc{hjust} \hlstd{=} \hlnum{1}\hlstd{))} \hlopt{+} \hlkwd{labs}\hlstd{(}\hlkwc{title} \hlstd{=} \hlstr{'Bozeman Weather Data'}\hlstd{)} \hlopt{+} \hlkwd{ylab}\hlstd{(}\hlkwd{expression}\hlstd{(}\hlstr{'Proportion of Days Below 32'} \hlopt{*~}\hlstd{degree}\hlopt{*}\hlstd{F))}
-\end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): could not find function "{}ggplot"{}}}\end{kframe}
+{\centering \includegraphics[width=\maxwidth]{figure/prob1-2} 
+
+}
+
+
+
 \end{knitrout}
 
 
 \item%2
 {\it Estimate a linear trend model for the proportion of measured days below freezing and report the parametric (t-test) linear trend test results in a sentence. Also discuss scope of inference for this test in a sentence or two (random sampling and random assignment and their implications).}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{lm.Year} \hlkwb{<-} \hlkwd{lm}\hlstd{(PropDays} \hlopt{~} \hlstd{Year,} \hlkwc{data} \hlstd{= Data1)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
 
-The true mean proportion of days below freezing was associated with a decrease of \ensuremath{-3.1172237\times 10^{-4}} days per year in these years recorded at the spots in Bozeman data were collected.
+
+The true mean proportion of days below freezing was associated with a decrease of \ensuremath{-0.0003117} days per year in these years recorded at the spots in Bozeman data were collected.
 
 Data were taken through an observational study and years were not randomly chosen, which is why we stated the conclusion using the wording ``associated" and ``in these years recorded at the spots in Bozeman data were collected". %as we teach our students to do...
 
@@ -71,44 +113,33 @@ Specific in to these data, temperature was not recorded every day of each year.T
 \item%4
 {\it Generate a permutation test for the trend with the proportion response. I performed one in the syllabus (page 6) using the ``shuffle" function from the ``mosaic" package. Report a plot of the permutation distribution, the {\bf test statistic} you used, and a p-value. Generally randomization based tests are more robust to violations of the normality assumption as long as the distribution (shape and variability) is the same for all observations except for differences in the {\it center} or mean. Why would that be advantageous with this response?}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{lm} \hlkwb{<-} \hlkwd{numeric}\hlstd{(}\hlnum{10000}\hlstd{)}
-\hlstd{lm_year.b} \hlkwb{<-} \hlkwa{NULL}
-
-\hlkwa{for}\hlstd{(i} \hlkwa{in} \hlnum{1}\hlopt{:}\hlnum{10000}\hlstd{)\{}
-  \hlstd{lm[i]} \hlkwb{<-} \hlkwd{coef}\hlstd{(}\hlkwd{lm}\hlstd{(Data1}\hlopt{$}\hlstd{PropDays} \hlopt{~} \hlkwd{shuffle}\hlstd{(Data1}\hlopt{$}\hlstd{Year)))[}\hlnum{2}\hlstd{]}
-  \hlstd{\}}
-\end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): could not find function "{}shuffle"{}}}\begin{alltt}
-\hlkwd{hist}\hlstd{(lm,} \hlkwc{main} \hlstd{=} \hlstr{"Histogram of 10000 Permutations of \textbackslash{}n Year and Resulting \textbackslash{}n LM Slope Coefficients"}\hlstd{,} \hlkwc{xlab} \hlstd{=} \hlkwd{expression}\hlstd{(beta[Year]),} \hlkwc{ylab} \hlstd{=} \hlstr{"Count"}\hlstd{)}
-\hlkwd{abline}\hlstd{(}\hlkwc{v} \hlstd{=} \hlkwd{coef}\hlstd{(lm.Year)[}\hlnum{2}\hlstd{],} \hlkwc{col} \hlstd{=} \hlstr{"purple"}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/prob4-1} 
-\begin{kframe}\begin{alltt}
-\hlstd{perm_pvalue} \hlkwb{<-} \hlstd{(}\hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(lm}\hlopt{<=}\hlkwd{coef}\hlstd{(lm.Year)[}\hlnum{2}\hlstd{]))} \hlopt{+} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(lm}\hlopt{>=-}\hlkwd{coef}\hlstd{(lm.Year)[}\hlnum{2}\hlstd{])))}\hlopt{/}\hlkwd{length}\hlstd{(lm)}
-\end{alltt}
-\end{kframe}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}
+
+{\centering \includegraphics[width=\maxwidth]{figure/prob4o-1} 
+
+}
+
+
+
 \end{knitrout}
 
 $H_{o}$: $\beta_{Year}$ = 0
 
 $H_{a}$: $\beta_{Year} \neq$ 0
 
-Based on 10000 permutations, the resulted in a pvalue of 0, from a test statistic of \ensuremath{-3\times 10^{-4}}, which is also the estimated slope from a model with the observed data.
+Based on 10000 permutations, the resulted in a pvalue of 0.0022, from a test statistic of \ensuremath{-0.0003}, which is also the estimated slope from a model with the observed data.
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{par}\hlstd{(}\hlkwc{mfrow}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,}\hlnum{1}\hlstd{))}
-\hlkwd{plot}\hlstd{(lm.Year,} \hlkwc{which} \hlstd{=} \hlnum{2}\hlstd{)}
-\end{alltt}
-\end{kframe}
-\includegraphics[width=\maxwidth]{figure/prob4x-1} 
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}
+
+{\centering \includegraphics[width=\maxwidth]{figure/prob4x-1} 
+
+}
+
+
 
 \end{knitrout}
 The Normal Q-Q plot shows some slight deviations from normality in the tails. If the normality assumption is not met, the pvalues from the F tests for the coefficients in the model output may be incorrect. Because the residuals (and therefore the response) are not perfectly normally distributed, it may be advantageous to consider a test that is not based on the normality assumption, such as the permutation test.
@@ -119,94 +150,42 @@ The Normal Q-Q plot shows some slight deviations from normality in the tails. If
 {\bf What does he mean by ``and its permutation test"? -- AM}
 
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{model1s}\hlkwb{<-}\hlkwd{mblm}\hlstd{(PropDays}\hlopt{~}\hlstd{Year,}\hlkwc{data}\hlstd{=Data1,}\hlkwc{repeated}\hlstd{=F)}
-\hlstd{model1s.coef} \hlkwb{<-} \hlkwd{coef}\hlstd{(model1s)[}\hlnum{2}\hlstd{]}
-
-\hlstd{year} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwd{replicate}\hlstd{(}\hlnum{10000}\hlstd{,} \hlkwd{shuffle}\hlstd{(Data1}\hlopt{$}\hlstd{Year)))}
-\end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in FUN(X[[i]], ...): could not find function "{}shuffle"{}}}\begin{alltt}
-\hlstd{year}\hlopt{$}\hlstd{pdays} \hlkwb{<-} \hlstd{Data1}\hlopt{$}\hlstd{PropDays}
-\end{alltt}
+{\texttt lm()} gave an estimated slope coefficeint of \ensuremath{-0.0003117} and {\texttt mblm()} gave an estimated slope coefficient of \ensuremath{-0.0003161}.
 
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in year\$pdays <- Data1\$PropDays: object 'year' not found}}\begin{alltt}
-\hlstd{shuffled.frame} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{pdays} \hlstd{= year}\hlopt{$}\hlstd{pdays)}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in data.frame(pdays = year\$pdays): object 'year' not found}}\begin{alltt}
-\hlstd{mblm.mod} \hlkwb{<-} \hlkwa{NULL}
-\hlstd{mblm.coeff} \hlkwb{<-} \hlkwd{numeric}\hlstd{(}\hlnum{10000}\hlstd{)}
-\hlstd{mblm.mod} \hlkwb{<-} \hlkwd{lapply}\hlstd{(}\hlnum{1}\hlopt{:}\hlnum{10000}\hlstd{,} \hlkwa{function}\hlstd{(}\hlkwc{i}\hlstd{)\{}
-  \hlstd{shuffled.frame}\hlopt{$}\hlstd{year} \hlkwb{<-} \hlstd{year[,i]}
-  \hlkwd{return}\hlstd{(}\hlkwd{mblm}\hlstd{(pdays}\hlopt{~}\hlstd{year,} \hlkwc{data}\hlstd{=shuffled.frame,}\hlkwc{repeated} \hlstd{= F))}
-\hlstd{\})}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in FUN(X[[i]], ...): object 'year' not found}}\begin{alltt}
-\hlcom{# Excercise for Andrea!}
-\hlcom{# level of difficulty: 1 (after seeing mblm.mod of course ;) }
-\hlstd{mblm.coeff} \hlkwb{<-} \hlkwd{sapply}\hlstd{(mblm.mod,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}\hlkwd{coef}\hlstd{(x)[}\hlnum{2}\hlstd{]\})}
-
-\hlstd{pvalue.mblm} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{c}\hlstd{(}\hlkwd{which}\hlstd{(mblm.coeff}\hlopt{<=}\hlstd{model1s.coef),} \hlkwd{which}\hlstd{(mblm.coeff}\hlopt{>=-}\hlstd{model1s.coef)))}\hlopt{/}\hlkwd{length}\hlstd{(mblm.coeff)}
-
-
-\hlstd{CI}\hlkwb{<-}\hlkwd{confint}\hlstd{(model1s)[}\hlnum{2}\hlstd{,]} \hlcom{#Extract CI and check whether 0 is in interval}
-\hlcom{#(0>CI[1])&(0<CI[2]) #If 0 is in interval, FTR H0}
-
-\hlstd{dec.mblm} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlkwd{rep}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{10000}\hlstd{))}
-
-\hlcom{#took about 3-4 hours to run}
-\hlkwa{for}\hlstd{(i} \hlkwa{in} \hlnum{1}\hlopt{:}\hlnum{10000}\hlstd{)\{}
-  \hlstd{dec.mblm[i]} \hlkwb{<-} \hlkwd{ifelse}\hlstd{(}\hlkwd{confint}\hlstd{(mblm.mod[[i]])[}\hlnum{2}\hlstd{,}\hlnum{1}\hlstd{]}\hlopt{<}\hlnum{0} \hlopt{&} \hlkwd{confint}\hlstd{(mblm.mod[[i]])[}\hlnum{2}\hlstd{,}\hlnum{2}\hlstd{]}\hlopt{>=}\hlnum{0}\hlstd{,} \hlstr{"R"}\hlstd{,} \hlstr{"FTR"}\hlstd{)}
-\hlstd{\}}
-\end{alltt}
-
-
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in UseMethod("{}vcov"{}): no applicable method for 'vcov' applied to an object of class "{}NULL"{}}}\begin{alltt}
-\hlstd{cl.mblm.confint} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(}\hlkwd{as.factor}\hlstd{(dec.mblm)} \hlopt{==} \hlstr{"R"}\hlstd{))}\hlopt{/}\hlkwd{length}\hlstd{(dec.mblm)}
-
-\hlstd{cl.mblm.confint.save} \hlkwb{<-} \hlnum{0.3476}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
-
-{\texttt lm()} gave an estimated slope coefficeint of \ensuremath{-3.1172237\times 10^{-4}} and {\texttt mblm()} gave an estimated slope coefficient of \ensuremath{-3.1612223\times 10^{-4}}.
-
-Using the same hypotheses from 4, but with the {\texttt mblm()} function fitting the model with the median response, the permutation test based on 10,000 iterations led to a pvalue of \ensuremath{NaN} using the test statistic of the observed slope coefficient (\ensuremath{-3.1612223\times 10^{-4}}) and the null hypothesis of no relationship between year and temperature. The explicit hypotheses are stated below. There is strong evidence that year had an effect on median temperature in these data. 
+Using the same hypotheses from 4, but with the {\texttt mblm()} function fitting the model with the median response, the permutation test based on 10,000 iterations led to a pvalue of 0.0023 using the test statistic of the observed slope coefficient (\ensuremath{-0.0003161}) and the null hypothesis of no relationship between year and temperature. The explicit hypotheses are stated below. There is strong evidence that year had an effect on median temperature in these data. 
 $H_{o}$: $\beta_{Year.median}$ = 0
 
 $H_{a}$: $\beta_{Year.median} \neq$ 0
 
-It is estimated that the median temperature in this data set decreased by \ensuremath{-3.1612223\times 10^{-4}} $\degrees$F each year with an associated 95\% confidence interval of \ensuremath{-3.6978709\times 10^{-4}} to \ensuremath{-2.404847\times 10^{-4}} $\degrees$F.
+It is estimated that the median temperature in this data set decreased by \ensuremath{-0.0003161} $^\circ$F each year with an associated 95\% confidence interval of \ensuremath{-0.0003698} to \ensuremath{-0.0002405} $^\circ$F.
 
-However, I would question the validity of the confidence level set using {\texttt confint()} on an {\texttt mblm()} object. If there was strong evidence of an effect of temperature, at the 95\% confidence level, we would expect to ``reject" 5\% of the time, meaning that approximately 5\% of confidence intervals, in the long run, should contain 0. We ran 10,000 simulations and 0\% contained 0. Something is wrong.
+However, I would question the validity of the confidence level set using {\texttt confint()} on an {\texttt mblm()} object. If there was strong evidence of an effect of temperature, at the 95\% confidence level, we would expect to ``reject" 5\% of the time, meaning that approximately 5\% of confidence intervals, in the long run, should contain 0.
 
 
 \item%6
 {\it Use the residual error variance estimate from your linear model for the proportion responses to simulate a series with no trend (constant mean and you can leave it at 0) and normal white noise with that same variance. Use that simulation code to perform a simulation study of the Type I error rate for the parametric t-test for the slope coefficient, the test using the confidence interval from ``mblm", and your permutation test (use 500 permutations and do 250 simulations to keep the run time somewhat manageable). Report the simulation-based Type I error rates when using a 5\% significance level test for the three procedures with the same sample size as the original data set.}
 
-{\bf I don't know what he means on this problem. Are we supposed to basically re-do 4 but with the mean only model?}
+I assume we use $\alpha=0.05$?
+
+{\bf I don't understand what the permutation test is for. I can do a permutation test, but I don' t know what he wants us to test.} \emph{We're evalauating the Type I error rate of the permutation test on fake data with no trend.}
+
+
+
+lm $t$-test type I error rate: 0.0516
+
+mblm CI type I error rate: 0.0557
+
+lm permutation test type I error rate: 0.068
+
+{\bf Re-do everything, but with the random noise responses rather than the obesrved data.}
 
 \begin{itemize}
 \item%6a
-{\it For the parametric test, the p-value can be extracted from the ``lm"  model ``summary"'s using ``summary(model1)$coef[2,4]".}
+{\it For the parametric test, the p-value can be extracted from the ``lm"  model ``summary"'s using ``summary(model1)\$coef[2,4]".}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{resid.var} \hlkwb{<-} \hlkwd{summary}\hlstd{(lm.Year)}\hlopt{$}\hlstd{sigma}\hlopt{^}\hlnum{2}
 
-\hlstd{rand.noise} \hlkwb{<-} \hlkwd{rnorm}\hlstd{(}\hlnum{10000}\hlstd{,}\hlnum{0}\hlstd{,resid.var)}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
 
 \item%6b
 {\it It is best and easiest if you do one loop for the simulations and then for each simulated data set in each loop generate the three test results, extracting the p-values that each produces. If you struggle to set this up, please send me an email or stop by with an attempt at your code for some feedback.}
@@ -221,7 +200,7 @@ However, I would question the validity of the confidence level set using {\textt
 
 Let $\phi^{k}$ = the correlation between observations taken k time points apart (k lags apart), such that for time points 0 units apart, $\phi^{0}$ = 1.
 
-In class we derived that the variance at a given time point, Var($y_{t}$) = Cov($y_{t}$,$y_{t}$) = $\frac{\sigma^2_{e}}{(1-\phi^2)$}.
+In class we derived that the variance at a given time point, Var($y_{t}$) = Cov($y_{t}$,$y_{t}$) = $\frac{\sigma^2_{e}}{(1-\phi^2)}$.
 
 
 \begin{enumerate}
@@ -232,9 +211,14 @@ In class we derived that the variance at a given time point, Var($y_{t}$) = Cov(
 
 White Noise Variance = $\sigma^2$
 
-$\sigma^2_{0.03}$ = $\frac{0.0010413}{1-0.03}  = \frac{0.0010413{0.97} = 0.0012$
-
-$\sigma^2_{0.06}$ = $\frac{0.0010413}{1-0.06}  = \frac{0.0010413}{0.94} = 0.0011$
+In problem 2, we observed a residual variance of 0.0010413, so $0.0010413 = \dfrac{\sigma^2}{1-\phi^2}$. Solving for $\sigma^2$, the white noise variance is
+$$
+\sigma^2 = (1-\phi^2) 0.0010413.
+$$
+Now plugging in $\phi=0.3$ and $\phi=0.6$, we get
+$$\sigma^2_{0.3} = (1-0.3^2) 0.0010413 = 0.0009475$$
+and
+$$\sigma^2_{0.6} = (1-0.3^2) 0.0010413 = 0.0006664$$
 
 \item%7b
 {\it To simulate the process we can use this value in the ``arima.sim" function in something like ``arima.sim(n=2000,list(ar=c(0.3)),sd=5)" where ``n=2000" provides 2000 simulated observations, ``model=list(ar=c(0.3))" determines that we are using an AR(1) process with parameter of of 0.3, and ``sd=5" controls the SD of the normal white noise used to build the AR(1) process (this is {\bf not} the variance of the AR(1) process). Check that you get about your expected results using something like:}
@@ -242,15 +226,12 @@ $\sigma^2_{0.06}$ = $\frac{0.0010413}{1-0.06}  = \frac{0.0010413}{0.94} = 0.0011
 {\bf I must be doing something wrong, these are completely off.}
 
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{ar1sim}\hlkwb{<-}\hlkwd{arima.sim}\hlstd{(}\hlkwc{n}\hlstd{=}\hlnum{2000}\hlstd{,}\hlkwc{model}\hlstd{=}\hlkwd{list}\hlstd{(}\hlkwc{ar}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{0.6}\hlstd{)),}\hlkwc{sd}\hlstd{=}\hlnum{5}\hlstd{)}
-\hlkwd{var}\hlstd{(ar1sim)}
-
-\hlstd{ar1sim}\hlkwb{<-}\hlkwd{arima.sim}\hlstd{(}\hlkwc{n}\hlstd{=}\hlnum{2000}\hlstd{,}\hlkwc{model}\hlstd{=}\hlkwd{list}\hlstd{(}\hlkwc{ar}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{0.3}\hlstd{)),}\hlkwc{sd}\hlstd{=}\hlnum{5}\hlstd{)}
-\hlkwd{var}\hlstd{(ar1sim)}
-\end{alltt}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+[1] 0.03239275
+[1] 0.03323242
+\end{verbatim}
 \end{kframe}
 \end{knitrout}
 
@@ -262,37 +243,166 @@ $\sigma^2_{0.06}$ = $\frac{0.0010413}{1-0.06}  = \frac{0.0010413}{0.94} = 0.0011
 \item%9
 {\it The Zhang method you read about is also available in the ``zyp" package but it only provides confidence intervals and I am not completely convinced by their discussion of the intervals provided without more exploration. But you can get estimates from ``zyp.sen" and confidence intervals using ``confint.zyp" on the results from ``zyp.sen". The ``confint" function can also be applied to ``mblm" results. Find and compare the two confidence intervals for the Sen-estimators for the proportion response time series. No simulation study here - just complete the analysis.}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlstd{zyp.Year} \hlkwb{<-} \hlkwd{zyp.sen}\hlstd{(PropDays} \hlopt{~} \hlstd{Year,} \hlkwc{data} \hlstd{= Data1)}
-\end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): could not find function "{}zyp.sen"{}}}\begin{alltt}
-\hlstd{CI.zyp} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlkwd{confint.zyp}\hlstd{(zyp.Year)[}\hlnum{2}\hlstd{,])}
-\end{alltt}
 
 
-{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in eval(expr, envir, enclos): could not find function "{}confint.zyp"{}}}\end{kframe}
+The 95\% confidence interval using {\texttt confint(mblm.object)} was (\ensuremath{-0.0003698}, \ensuremath{-0.0002405}).
+The 95\% confidence interval using {\texttt zyp.confint(zyp.sen.object)} was (\ensuremath{-0.0005074}, \ensuremath{-0.0001099}).
+
+The widths are nearly the same, but the {\texttt confint(mblm())} confidence interval is shifted up slightly compared to the {\texttt zyp.confint()} confidence interval.
+
+
+\item%10
+{\it Make a plot of the original proportion response time series with the parametric linear, Theil-Sen, and Zhang methods$/$models on the same plot. You may want to use \verb|plot(y~x,type="l")| and then add lines to the plot.}
+
+Estimates from all three functions visually are very similar.
+
+
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}
+
+{\centering \includegraphics[width=\maxwidth]{figure/prob10-1} 
+
+}
+
+
+
 \end{knitrout}
 
 
 
+\end{enumerate}
+
+\appendix
+\section*{R Code}
+
+\begin{enumerate}
+
+\setcounter{enumi}{3}
+\item%1
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+ \hlkwd{ggplot}\hlstd{(}\hlkwc{data} \hlstd{= Data1,} \hlkwd{aes}\hlstd{(}\hlkwc{x} \hlstd{= Year,} \hlkwc{y} \hlstd{= DaysBelow32))} \hlopt{+} \hlkwd{geom_point}\hlstd{()} \hlopt{+} \hlkwd{scale_x_continuous}\hlstd{(}\hlkwc{breaks} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{seq}\hlstd{(}\hlkwd{min}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{Year)),}\hlkwd{max}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{Year))}\hlopt{+}\hlnum{5}\hlstd{,} \hlkwc{by} \hlstd{=} \hlnum{5}\hlstd{)))} \hlopt{+} \hlkwd{scale_y_continuous}\hlstd{(}\hlkwc{breaks} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{seq}\hlstd{(}\hlkwd{min}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{DaysBelow32)),}\hlkwd{max}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{DaysBelow32))}\hlopt{+}\hlnum{5}\hlstd{,} \hlkwc{by} \hlstd{=} \hlnum{10}\hlstd{)))} \hlopt{+} \hlkwd{theme_bw}\hlstd{()} \hlopt{+} \hlkwd{theme}\hlstd{(}\hlkwc{axis.text.x} \hlstd{=} \hlkwd{element_text}\hlstd{(}\hlkwc{angle} \hlstd{=} \hlnum{45}\hlstd{,} \hlkwc{hjust} \hlstd{=} \hlnum{1}\hlstd{))} \hlopt{+} \hlkwd{labs}\hlstd{(}\hlkwc{title} \hlstd{=} \hlstr{'Bozeman Weather Data'}\hlstd{)} \hlopt{+} \hlkwd{ylab}\hlstd{(}\hlkwd{expression}\hlstd{(}\hlstr{'Days Below 32'} \hlopt{*~}\hlstd{degree}\hlopt{*}\hlstd{F))}
+
+\hlkwd{ggplot}\hlstd{(}\hlkwc{data} \hlstd{= Data1,} \hlkwd{aes}\hlstd{(}\hlkwc{x} \hlstd{= Year,} \hlkwc{y} \hlstd{= PropDays))} \hlopt{+} \hlkwd{geom_point}\hlstd{()} \hlopt{+} \hlkwd{scale_x_continuous}\hlstd{(}\hlkwc{breaks} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{seq}\hlstd{(}\hlkwd{min}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{Year)),}\hlkwd{max}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{Year))}\hlopt{+}\hlnum{5}\hlstd{,} \hlkwc{by} \hlstd{=} \hlnum{5}\hlstd{)))} \hlopt{+} \hlkwd{scale_y_continuous}\hlstd{(}\hlkwc{limits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{),} \hlkwc{breaks} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{seq}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{,} \hlkwc{by} \hlstd{=} \hlnum{0.1}\hlstd{)))} \hlopt{+} \hlkwd{theme_bw}\hlstd{()} \hlopt{+} \hlkwd{theme}\hlstd{(}\hlkwc{axis.text.x} \hlstd{=} \hlkwd{element_text}\hlstd{(}\hlkwc{angle} \hlstd{=} \hlnum{45}\hlstd{,} \hlkwc{hjust} \hlstd{=} \hlnum{1}\hlstd{))} \hlopt{+} \hlkwd{labs}\hlstd{(}\hlkwc{title} \hlstd{=} \hlstr{'Bozeman Weather Data'}\hlstd{)} \hlopt{+} \hlkwd{ylab}\hlstd{(}\hlkwd{expression}\hlstd{(}\hlstr{'Proportion of Days Below 32'} \hlopt{*~}\hlstd{degree}\hlopt{*}\hlstd{F))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\item%2
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{lm.Year} \hlkwb{<-} \hlkwd{lm}\hlstd{(PropDays} \hlopt{~} \hlstd{Year,} \hlkwc{data} \hlstd{= Data1)}
+\hlstd{resid.se} \hlkwb{<-} \hlkwd{summary}\hlstd{(lm.Year)}\hlopt{$}\hlstd{sigma} \hlcom{# Save this for later}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\addtocounter{enumii}{2}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# Run in parallel.}
+\hlcom{# Note: Most guidelines say don't use more than half of your CPU cores but whatevs...}
+\hlstd{cl} \hlkwb{<-} \hlkwd{makeCluster}\hlstd{(}\hlkwd{detectCores}\hlstd{())}
+\hlkwd{clusterExport}\hlstd{(cl,} \hlkwd{c}\hlstd{(}\hlstr{"Data1"}\hlstd{,} \hlstr{"shuffle"}\hlstd{))} \hlcom{# Load Data1 and mosaic::shuffle() on the nodes}
+\hlstd{lm_perm} \hlkwb{<-} \hlkwd{parSapply}\hlstd{(cl,} \hlkwd{seq_len}\hlstd{(}\hlnum{10000}\hlstd{),} \hlkwa{function}\hlstd{(}\hlkwc{i}\hlstd{)\{} \hlcom{# seq_len(10000) is the same as 1:10000}
+  \hlkwd{return}\hlstd{(}\hlkwd{coef}\hlstd{(}\hlkwd{lm}\hlstd{(Data1}\hlopt{$}\hlstd{PropDays} \hlopt{~} \hlkwd{shuffle}\hlstd{(Data1}\hlopt{$}\hlstd{Year)))[}\hlnum{2}\hlstd{])}
+\hlstd{\})}
+\hlkwd{stopCluster}\hlstd{(cl)} \hlcom{# Stop this cluster and start with a clean environment next time}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{hist}\hlstd{(lm_perm,} \hlkwc{main} \hlstd{=} \hlstr{"Histogram of 10000 Permutations of \textbackslash{}n Year and Resulting \textbackslash{}n LM Slope Coefficients"}\hlstd{,} \hlkwc{xlab} \hlstd{=} \hlkwd{expression}\hlstd{(beta[Year]),} \hlkwc{ylab} \hlstd{=} \hlstr{"Count"}\hlstd{,} \hlkwc{breaks} \hlstd{=} \hlnum{50}\hlstd{)}
+\hlkwd{abline}\hlstd{(}\hlkwc{v} \hlstd{=} \hlkwd{coef}\hlstd{(lm.Year)[}\hlnum{2}\hlstd{],} \hlkwc{col} \hlstd{=} \hlstr{"purple"}\hlstd{)}
+
+\hlstd{perm_pvalue} \hlkwb{<-} \hlstd{(}\hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(lm_perm}\hlopt{<=}\hlkwd{coef}\hlstd{(lm.Year)[}\hlnum{2}\hlstd{]))} \hlopt{+} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(lm_perm}\hlopt{>=-}\hlkwd{coef}\hlstd{(lm.Year)[}\hlnum{2}\hlstd{])))}\hlopt{/}\hlkwd{length}\hlstd{(lm_perm)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{par}\hlstd{(}\hlkwc{mfrow}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,}\hlnum{1}\hlstd{))}
+\hlkwd{plot}\hlstd{(lm.Year,} \hlkwc{which} \hlstd{=} \hlnum{2}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\item%5
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{model1s}\hlkwb{<-}\hlkwd{mblm}\hlstd{(PropDays}\hlopt{~}\hlstd{Year,}\hlkwc{data}\hlstd{=Data1,}\hlkwc{repeated}\hlstd{=F)}
+\hlstd{model1s.coef} \hlkwb{<-} \hlkwd{coef}\hlstd{(model1s)[}\hlnum{2}\hlstd{]}
+
+\hlstd{year} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwd{replicate}\hlstd{(}\hlnum{10000}\hlstd{,} \hlkwd{shuffle}\hlstd{(Data1}\hlopt{$}\hlstd{Year)))}
+\hlstd{shuffled.frame} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{pdays} \hlstd{= Data1}\hlopt{$}\hlstd{PropDays,} \hlkwc{suffled.year} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlkwd{as.numeric}\hlstd{(}\hlnum{NA}\hlstd{),} \hlnum{109}\hlstd{))}
+
+\hlstd{cl} \hlkwb{<-} \hlkwd{makeCluster}\hlstd{(}\hlkwd{detectCores}\hlstd{())}
+\hlkwd{clusterExport}\hlstd{(cl,} \hlkwd{c}\hlstd{(}\hlstr{"Data1"}\hlstd{,} \hlstr{"shuffled.frame"}\hlstd{,} \hlstr{"mblm"}\hlstd{))}
+\hlstd{mblm.mod} \hlkwb{<-} \hlkwd{parCapply}\hlstd{(cl, year,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
+  \hlstd{shuffled.frame}\hlopt{$}\hlstd{year} \hlkwb{<-} \hlstd{x}
+  \hlkwd{return}\hlstd{(}\hlkwd{mblm}\hlstd{(pdays}\hlopt{~}\hlstd{year,} \hlkwc{data}\hlstd{=shuffled.frame,}\hlkwc{repeated} \hlstd{= F))}
+\hlstd{\})}
+\hlkwd{stopCluster}\hlstd{(cl)}
+
+\hlcom{# Excercise for Andrea!}
+\hlcom{# level of difficulty: 1 (after seeing mblm.mod of course ;) }
+\hlstd{mblm.coeff} \hlkwb{<-} \hlkwd{sapply}\hlstd{(mblm.mod,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}\hlkwd{coef}\hlstd{(x)[}\hlnum{2}\hlstd{]\})}
+
+\hlstd{pvalue.mblm} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{c}\hlstd{(}\hlkwd{which}\hlstd{(mblm.coeff}\hlopt{<=}\hlstd{model1s.coef),} \hlkwd{which}\hlstd{(mblm.coeff}\hlopt{>=-}\hlstd{model1s.coef)))}\hlopt{/}\hlkwd{length}\hlstd{(mblm.coeff)}
 
 
+\hlstd{CI}\hlkwb{<-}\hlkwd{confint}\hlstd{(model1s)[}\hlnum{2}\hlstd{,]} \hlcom{#Extract CI and check whether 0 is in interval}
+\hlcom{#(0>CI[1])&(0<CI[2]) #If 0 is in interval, FTR H0}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\item%6
+
+\item%7
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{sig3} \hlkwb{<-} \hlkwd{sqrt}\hlstd{((}\hlnum{1}\hlopt{-}\hlnum{0.3}\hlopt{^}\hlnum{2}\hlstd{))} \hlopt{*} \hlstd{resid.se}
+\hlstd{sig6} \hlkwb{<-} \hlkwd{sqrt}\hlstd{((}\hlnum{1}\hlopt{-}\hlnum{0.6}\hlopt{^}\hlnum{2}\hlstd{))} \hlopt{*} \hlstd{resid.se}
+
+\hlstd{ar1sim}\hlkwb{<-}\hlkwd{arima.sim}\hlstd{(}\hlkwc{n}\hlstd{=}\hlnum{2000}\hlstd{,}\hlkwc{model}\hlstd{=}\hlkwd{list}\hlstd{(}\hlkwc{ar}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{0.3}\hlstd{)),}\hlkwc{sd}\hlstd{=sig3)}
+\hlkwd{sd}\hlstd{(ar1sim)}
+
+\hlstd{ar1sim}\hlkwb{<-}\hlkwd{arima.sim}\hlstd{(}\hlkwc{n}\hlstd{=}\hlnum{2000}\hlstd{,}\hlkwc{model}\hlstd{=}\hlkwd{list}\hlstd{(}\hlkwc{ar}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{0.6}\hlstd{)),}\hlkwc{sd}\hlstd{=sig6)}
+\hlkwd{sd}\hlstd{(ar1sim)} \hlcom{# about right :)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\addtocounter{enumii}{2}
+\item%9
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{zyp.Year} \hlkwb{<-} \hlkwd{zyp.sen}\hlstd{(PropDays} \hlopt{~} \hlstd{Year,} \hlkwc{data} \hlstd{= Data1)}
+
+\hlstd{CI.zyp} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlkwd{confint.zyp}\hlstd{(zyp.Year)[}\hlnum{2}\hlstd{,])}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\item
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{plot}\hlstd{(PropDays} \hlopt{~} \hlstd{Year,} \hlkwc{data} \hlstd{= Data1,} \hlkwc{type} \hlstd{=} \hlstr{"l"}\hlstd{,} \hlkwc{ylim} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{),} \hlkwc{ylab} \hlstd{=} \hlkwd{expression}\hlstd{(}\hlstr{'Proportion of Days Below 32'} \hlopt{*~}\hlstd{degree}\hlopt{*}\hlstd{F))}
+\hlkwd{abline}\hlstd{(lm.Year)}
+\hlkwd{abline}\hlstd{(model1s,} \hlkwc{col} \hlstd{=} \hlstr{"purple"}\hlstd{)}
+\hlkwd{abline}\hlstd{(}\hlkwc{a} \hlstd{= zyp.Year}\hlopt{$}\hlstd{coefficients[}\hlnum{1}\hlstd{],} \hlkwc{b} \hlstd{= zyp.Year}\hlopt{$}\hlstd{coefficients[}\hlnum{2}\hlstd{],} \hlkwc{col} \hlstd{=} \hlstr{"red"}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\end{enumerate}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+\end{document}
