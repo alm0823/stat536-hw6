@@ -1,4 +1,4 @@
-drea\documentclass[11pt]{article}
+\documentclass[11pt]{article}
 \usepackage{fullpage,graphicx,float,amsmath,enumitem,hyperref}
 \setlist{parsep=5.5pt}
 \setlength{\parindent}{0pt}
@@ -81,7 +81,7 @@ ggplot(data = Data1, aes(x = Year, y = PropDays)) + geom_point() +
 \item%2
 {\it Estimate a linear trend model for the proportion of measured days below freezing and report the parametric (t-test) linear trend test results in a sentence. Also discuss scope of inference for this test in a sentence or two (random sampling and random assignment and their implications).}
 
-<<prob2, dependson = "readin">>=
+<<prob2>>=
 lm.Year <- lm(PropDays ~ Year, data = Data1)
 resid.se <- summary(lm.Year)$sigma # Save this for later
 @
@@ -98,7 +98,7 @@ Specific in to these data, temperature was not recorded every day of each year.T
 \item%4
 {\it Generate a permutation test for the trend with the proportion response. I performed one in the syllabus (page 6) using the ``shuffle" function from the ``mosaic" package. Report a plot of the permutation distribution, the {\bf test statistic} you used, and a p-value. Generally randomization based tests are more robust to violations of the normality assumption as long as the distribution (shape and variability) is the same for all observations except for differences in the {\it center} or mean. Why would that be advantageous with this response?}
 
-<<prob4, dependson = "prob2">>=
+<<prob4>>=
 # I don't trust knitr's caching so I'm saving things manually.
 if(file.exists("prob4.Rdata")){
   load("prob4.Rdata")
@@ -116,7 +116,7 @@ if(file.exists("prob4.Rdata")){
 }
 @
 
-<<prob4o, dependson = "prob4">>=
+<<prob4o>>=
 hist(lm_perm, main = "Histogram of 10000 Permutations of \n Year and Resulting \n LM Slope Coefficients",
      xlab = expression(beta[Year]), ylab = "Count", breaks = 50)
 abline(v = coef(lm.Year)[2], col = "purple")
@@ -131,7 +131,7 @@ $H_{a}$: $\beta_{Year} \neq$ 0
 
 Based on 10000 permutations, the resulted in a pvalue of \Sexpr{perm_pvalue}, from a test statistic of \Sexpr{round(coef(lm.Year)[2],4)}, which is also the estimated slope from a model with the observed data.
 
-<<prob4x, dependson = "prob2">>=
+<<prob4x>>=
 par(mfrow=c(1,1))
 plot(lm.Year, which = 2)
 @
@@ -143,7 +143,7 @@ The Normal Q-Q plot shows some slight deviations from normality in the tails. If
 {\bf What does he mean by ``and its permutation test"? -- AM}
 
 
-<<prob5, dependson = "readin">>=
+<<prob5>>=
 model1s<-mblm(PropDays~Year,data=Data1,repeated=F)
 model1s.coef <- coef(model1s)[2]
 
@@ -160,12 +160,13 @@ if(file.exists("prob5.Rdata")){
     return(mblm(pdays~year, data=shuffled.frame,repeated = F))
   })
   stopCluster(cl)
-  save(mblm.mod, file = "prob5.Rdata")
-}
 
-# Excercise for Andrea!
-# level of difficulty: 1 (after seeing mblm.mod of course ;) 
-mblm.coeff <- sapply(mblm.mod, function(x){coef(x)[2]})
+  # Excercise for Andrea!
+  # level of difficulty: 1 (after seeing mblm.mod of course ;) 
+  mblm.coeff <- sapply(mblm.mod, function(x){coef(x)[2]})
+
+  save(mblm.coeff, file = "prob5.Rdata")
+}
 
 pvalue.mblm <- length(c(which(mblm.coeff<=model1s.coef), which(mblm.coeff>=-model1s.coef))) /
   length(mblm.coeff)
@@ -194,7 +195,7 @@ I assume we use $\alpha=0.05$?
 
 {\bf I don't understand what the permutation test is for. I can do a permutation test, but I don' t know what he wants us to test.} \emph{We're evalauating the Type I error rate of the permutation test on fake data with no trend.}
 
-<<prob6, dependson = "prob2">>=
+<<prob6>>=
 # first is lm
 
 rand.noise <- data.frame(replicate(10000, rnorm(109, 0, resid.se)))
@@ -322,7 +323,7 @@ $$\sigma^2_{0.6} = (1-0.3^2) \Sexpr{resid.se^2} = \Sexpr{(1-0.6^2) * resid.se^2}
 {\bf I must be doing something wrong, these are completely off.}
 
 
-<<prob7b, echo = TRUE, dependson = "prob2">>=
+<<prob7b, echo = TRUE>>=
 sig3 <- sqrt((1-0.3^2)) * resid.se
 sig6 <- sqrt((1-0.6^2)) * resid.se
 
@@ -342,7 +343,7 @@ Residual variance from lm fit = \Sexpr{resid.se^2}
 \item%8
 {\it Repeat your simulation study of the parametric, permutation, and Theil-Sen linear trend test based on the CI. Report the estimated Type I error rates in the presence of AR(1) correlations with a parameter of 0.6 based on your work in the previous question for simulating the response time series. Discuss the impacts of having autocorrelation present on the various procedures.}
 
-<<prob8, dependson = "prob7b">>=
+<<prob8>>=
 # first is lm
 
 rand.ar1 <- data.frame(replicate(10000, arima.sim(n=109,model=list(ar=c(0.6)),sd=sig6)))
@@ -422,7 +423,7 @@ lm permutation test type I error rate: \Sexpr{lm.ar1.perm_type1}
 \item%9
 {\it The Zhang method you read about is also available in the ``zyp" package but it only provides confidence intervals and I am not completely convinced by their discussion of the intervals provided without more exploration. But you can get estimates from ``zyp.sen" and confidence intervals using ``confint.zyp" on the results from ``zyp.sen". The ``confint" function can also be applied to ``mblm" results. Find and compare the two confidence intervals for the Sen-estimators for the proportion response time series. No simulation study here - just complete the analysis.}
 
-<<prob9, dependson = "prob2">>=
+<<prob9>>=
 zyp.Year <- zyp.sen(PropDays ~ Year, data = Data1)
 
 CI.zyp <- c(confint.zyp(zyp.Year)[2,])
@@ -442,7 +443,7 @@ The widths are nearly the same, but the {\texttt confint(mblm())} confidence int
 Estimates from all three functions visually are very similar.
 
 
-<<prob10, dependson = "prob9">>=
+<<prob10>>=
 plot(PropDays ~ Year, data = Data1, type = "l", ylim = c(0,1), ylab = expression('Proportion of Days Below 32' *~degree*F))
 abline(lm.Year)
 abline(model1s, col = "purple")
