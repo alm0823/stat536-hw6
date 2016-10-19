@@ -62,14 +62,17 @@ head(Data1)
 
 <<prob1>>=
  ggplot(data = Data1, aes(x = Year, y = DaysBelow32)) + geom_point() +
-  scale_x_continuous(breaks = c(seq(min(as.numeric(Data1$Year)),max(as.numeric(Data1$Year))+5, by = 5))) +
-  scale_y_continuous(breaks = c(seq(min(as.numeric(Data1$DaysBelow32)),max(as.numeric(Data1$DaysBelow32))+5, by = 10))) +
+  scale_x_continuous(breaks = c(seq(min(as.numeric(Data1$Year)),
+    max(as.numeric(Data1$Year))+5, by = 5))) +
+  scale_y_continuous(breaks = c(seq(min(as.numeric(Data1$DaysBelow32)),
+    max(as.numeric(Data1$DaysBelow32))+5, by = 10))) +
   theme_bw() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(title = 'Bozeman Weather Data') +
   ylab(expression('Days Below 32' *~degree*F))
   
 ggplot(data = Data1, aes(x = Year, y = PropDays)) + geom_point() +
-  scale_x_continuous(breaks = c(seq(min(as.numeric(Data1$Year)),max(as.numeric(Data1$Year))+5, by = 5))) +
+  scale_x_continuous(breaks = c(seq(min(as.numeric(Data1$Year)),
+  max(as.numeric(Data1$Year))+5, by = 5))) +
   scale_y_continuous(limits = c(0,1), breaks = c(seq(0,1, by = 0.1))) +
   theme_bw() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   labs(title = 'Bozeman Weather Data') +
@@ -86,14 +89,14 @@ lm.Year <- lm(PropDays ~ Year, data = Data1)
 resid.se <- summary(lm.Year)$sigma # Save this for later
 @
 
-The true mean proportion of days below freezing was associated with a decrease of \Sexpr{coef(lm.Year)[2]} days per year in these years recorded at the spots in Bozeman data were collected.
+The true mean proportion of days below freezing was associated with a decrease of \Sexpr{-1*coef(lm.Year)[2]} days per year in these years recorded at the spots in Bozeman data were collected.
 
-Data were taken through an observational study and years were not randomly chosen, which is why we stated the conclusion using the wording ``associated" and ``in these years recorded at the spots in Bozeman data were collected". %as we teach our students to do...
+Data were taken through an observational study and years were not randomly chosen, which is why we stated the conclusion using the wording ``associated" and ``in these years recorded at the spots in Bozeman data were collected", respectively. %as we teach our students to do...
 
 \item%3
 {\it Discuss this proportion response versus using the count of days below zero per year, specific to this example and in general. What issues does using one or the other present?}
 
-Specific in to these data, temperature was not recorded every day of each year.To report the number of days below $32^{o}F$ may be misleading if there is a large discrepancy in the total number of days temperature was recorded each year. The proportion of days may still be misleading depending on which days of the year temperature was recorded, but it puts each year on the same scale.
+Specific in to these data, temperature was not recorded every day of each year. To report the number of days below $32^{o}F$ may be misleading if there is a large discrepancy in the total number of days temperature was recorded each year. The proportion of days may still be misleading depending on which days of the year temperature was recorded, but it puts each year on the same scale.
 
 \item%4
 {\it Generate a permutation test for the trend with the proportion response. I performed one in the syllabus (page 6) using the ``shuffle" function from the ``mosaic" package. Report a plot of the permutation distribution, the {\bf test statistic} you used, and a p-value. Generally randomization based tests are more robust to violations of the normality assumption as long as the distribution (shape and variability) is the same for all observations except for differences in the {\it center} or mean. Why would that be advantageous with this response?}
@@ -117,19 +120,23 @@ if(file.exists("prob4.Rdata")){
 @
 
 <<prob4o>>=
-hist(lm_perm, main = "Histogram of 10000 Permutations of \n Year and Resulting \n LM Slope Coefficients",
+hist(lm_perm, main = "Histogram of 10000 Permutations of \n 
+     Year and Resulting \n LM Slope Coefficients",
      xlab = expression(beta[Year]), ylab = "Count", breaks = 50)
 abline(v = coef(lm.Year)[2], col = "purple")
 
-perm_pvalue <- (length(which(lm_perm<=coef(lm.Year)[2])) + length(which(lm_perm>=-coef(lm.Year)[2]))) /
+perm_pvalue <- (length(which(lm_perm<=coef(lm.Year)[2])) + 
+                  length(which(lm_perm>=-coef(lm.Year)[2]))) /
   length(lm_perm)
 @
+The plot above shows the location of the observed result as a purple vertical line. 
+
 
 $H_{o}$: $\beta_{Year}$ = 0
 
 $H_{a}$: $\beta_{Year} \neq$ 0
 
-Based on 10000 permutations, the resulted in a pvalue of \Sexpr{perm_pvalue}, from a test statistic of \Sexpr{round(coef(lm.Year)[2],4)}, which is also the estimated slope from a model with the observed data.
+Based on 10000 permutations, the resulted in a two sided pvalue of \Sexpr{perm_pvalue}, from a test statistic of \Sexpr{round(coef(lm.Year)[2],4)}, which is also the estimated slope from a model with the observed data.
 
 <<prob4x>>=
 par(mfrow=c(1,1))
@@ -140,15 +147,13 @@ The Normal Q-Q plot shows some slight deviations from normality in the tails. If
 \item%5
 {\it The Sen estimator or, more commonly, Theil-Sen is based on a single median of all the possible pairwise generated slopes. Its standard version is available in the ``mblm" (median based linear models) R package developed by Lukasz Komsta. The package description provides more details (\url{https://cran.r-project.org/web/packages/mblm/mblm.pdf}). Note that with `mblm`, you need to use ``repeated=FALSE" to get the Theil-Sen estimator and not the better estimator developed by Siegel. The package has a ``summary" function that provides a test based on the nonparametric Wilcox test but it had terrible Type I error rates when I explored it. Without further explorations, I would recommend avoiding its use. Fortunately, our permutation approach can be used to develop a test based on the Theil-Sen slope coefficient. First, compare the estimated slope provided by ``mblm" to what you found from the linear model and its permutation test. Then develop a permutation test based on the slope coefficient from `mblm` - note that ``mblm" conveniently has the same output structure as ``lm". The confidence interval that runs on ``mblm" seems to perform well enough to study, so we can make 95\% confidence intervals and check whether 0 is in the interval or not as the following code suggests to use it to perform our 5\% significance level hypothesis test.}
 
-{\bf What does he mean by ``and its permutation test"? -- AM}
-
-
 <<prob5>>=
 model1s<-mblm(PropDays~Year,data=Data1,repeated=F)
 model1s.coef <- coef(model1s)[2]
 
 year <- data.frame(replicate(10000, shuffle(Data1$Year)))
-shuffled.frame <- data.frame(pdays = Data1$PropDays, suffled.year = rep(as.numeric(NA), 109))
+shuffled.frame <- data.frame(pdays = Data1$PropDays, 
+                             suffled.year = rep(as.numeric(NA), 109))
 
 if(file.exists("prob5.Rdata")){
   load("prob5.Rdata")
@@ -176,24 +181,22 @@ CI<-confint(model1s)[2,] #Extract CI and check whether 0 is in interval
 #(0>CI[1])&(0<CI[2]) #If 0 is in interval, FTR H0
 @
 
-{\texttt lm()} gave an estimated slope coefficeint of \Sexpr{coef(lm.Year)[2]} and {\texttt mblm()} gave an estimated slope coefficient of \Sexpr{coef(model1s)[2]}.
+{\texttt lm()} gave an estimated slope coefficeint of \Sexpr{coef(lm.Year)[2]} and {\texttt mblm()} gave an estimated slope coefficient of \Sexpr{coef(model1s)[2]} which was found to be ``statistically significant" in the permutation test.
 
-Using the same hypotheses from 4, but with the {\texttt mblm()} function fitting the model with the median response, the permutation test based on 10,000 iterations led to a pvalue of \Sexpr{pvalue.mblm} using the test statistic of the observed slope coefficient (\Sexpr{coef(model1s)[2]}) and the null hypothesis of no relationship between year and temperature. The explicit hypotheses are stated below. There is strong evidence that year had an effect on median temperature in these data. 
+Using the same hypotheses from 4, but with the {\texttt mblm()} function fitting the model with the median response, the permutation test based on 10,000 iterations led to a two sided pvalue of \Sexpr{pvalue.mblm} using the test statistic of the observed {\texttt mblm()} slope coefficient (\Sexpr{coef(model1s)[2]}) and the null hypothesis of no relationship between year and temperature. The explicit hypotheses are stated below. There is strong evidence that year was associated with an effect on median temperature in these data. 
+
 $H_{o}$: $\beta_{Year.median}$ = 0
 
 $H_{a}$: $\beta_{Year.median} \neq$ 0
 
-It is estimated that the median temperature in this data set decreased by \Sexpr{coef(model1s)[2]} $^\circ$F each year with an associated 95\% confidence interval of \Sexpr{CI[1]} to \Sexpr{CI[2]} $^\circ$F.
+It is estimated that the median temperature in this data set decreased by \Sexpr{-1*coef(model1s)[2]} $^\circ$F each subsequent year with an associated 95\% confidence interval of decreasing by \Sexpr{-1*CI[1]} to \Sexpr{-1*CI[2]} $^\circ$F each subsequent year.
 
-However, I would question the validity of the confidence level set using {\texttt confint()} on an {\texttt mblm()} object. If there was strong evidence of an effect of temperature, at the 95\% confidence level, we would expect to ``reject" 5\% of the time, meaning that approximately 5\% of confidence intervals, in the long run, should contain 0.
+However, I would question the validity of the confidence level set using {\texttt confint()} on an {\texttt mblm()} object. If there was strong evidence of an effect of temperature, at the 95\% confidence level, we would expect to ``reject" about 95\% of the time in the long run, meaning that approximately 95\% of confidence intervals, in the long run, should not contain 0. In this problem, we rejected the null, or found strong evidence that the 0 is not a plausible slope coefficient and the percentage of confidence intervals not containing 0 in 10,000 permutations using {\texttt mblm()} was \Sexpr{100-} {\bf Extract the pvalue I had saved for this..... not sure how to do.}
 
 
 \item%6
 {\it Use the residual error variance estimate from your linear model for the proportion responses to simulate a series with no trend (constant mean and you can leave it at 0) and normal white noise with that same variance. Use that simulation code to perform a simulation study of the Type I error rate for the parametric t-test for the slope coefficient, the test using the confidence interval from ``mblm", and your permutation test (use 500 permutations and do 250 simulations to keep the run time somewhat manageable). Report the simulation-based Type I error rates when using a 5\% significance level test for the three procedures with the same sample size as the original data set.}
 
-I assume we use $\alpha=0.05$?
-
-{\bf I don't understand what the permutation test is for. I can do a permutation test, but I don' t know what he wants us to test.} \emph{We're evalauating the Type I error rate of the permutation test on fake data with no trend.}
 
 <<prob6>>=
 # first is lm
@@ -271,13 +274,14 @@ lm.perm_type1 <- mean(lm.perm.pvals < 0.05)
 # matrix of reject/not reject outcomes
 @
 
+Based on 10,000 iterations, we came up with the following type I error rates:
+
 lm $t$-test type I error rate: \Sexpr{lm.noise_type1}
 
 mblm CI type I error rate: \Sexpr{mblm.noise_type1}
 
 lm permutation test type I error rate: \Sexpr{lm.perm_type1}
 
-{\bf Re-do everything, but with the random noise responses rather than the obesrved data.}
 
 \begin{itemize}
 \item%6a
@@ -316,15 +320,15 @@ $$
 Now plugging in $\phi=0.3$ and $\phi=0.6$, we get
 $$\sigma^2_{0.3} = (1-0.3^2) \Sexpr{resid.se^2} = \Sexpr{(1-0.3^2) * resid.se^2}$$
 and
-$$\sigma^2_{0.6} = (1-0.3^2) \Sexpr{resid.se^2} = \Sexpr{(1-0.6^2) * resid.se^2}$$
+$$\sigma^2_{0.6} = (1-0.6^2) \Sexpr{resid.se^2} = \Sexpr{(1-0.6^2) * resid.se^2}$$
 
 \item%7b
-{\it To simulate the process we can use this value in the ``arima.sim" function in something like ``arima.sim(n=2000,list(ar=c(0.3)),sd=5)" where ``n=2000" provides 2000 simulated observations, ``model=list(ar=c(0.3))" determines that we are using an AR(1) process with parameter of of 0.3, and ``sd=5" controls the SD of the normal white noise used to build the AR(1) process (this is {\bf not} the variance of the AR(1) process). Check that you get about your expected results using something like:}
-
-{\bf I must be doing something wrong, these are completely off.}
+{\it To simulate the process we can use this value in the ``arima.sim" function in something like ``arima.sim(n=2000,list(ar=c(0.3)),sd=5)" where ``n=2000" provides 2000 simulated observations, ``model=list(ar=c(0.3))" determines that we are using an AR(1) process with parameter of 0.3, and ``sd=5" controls the SD of the normal white noise used to build the AR(1) process (this is {\bf not} the variance of the AR(1) process). Check that you get about your expected results using something like:}
 
 
 <<prob7b, echo = TRUE>>=
+
+
 sig3 <- sqrt((1-0.3^2)) * resid.se
 sig6 <- sqrt((1-0.6^2)) * resid.se
 
@@ -421,6 +425,8 @@ mblm CI type I error rate: \Sexpr{mblm.ar1_type1}
 
 lm permutation test type I error rate: \Sexpr{lm.ar1.perm_type1}
 
+We see that the permutation test is resistent to the induced correlation structure while the theoretical test and CI are not. The permutation test does not have the independent error assumptions required by the theoretical test and CI, resulting in the increased error rate.
+
 \item%9
 {\it The Zhang method you read about is also available in the ``zyp" package but it only provides confidence intervals and I am not completely convinced by their discussion of the intervals provided without more exploration. But you can get estimates from ``zyp.sen" and confidence intervals using ``confint.zyp" on the results from ``zyp.sen". The ``confint" function can also be applied to ``mblm" results. Find and compare the two confidence intervals for the Sen-estimators for the proportion response time series. No simulation study here - just complete the analysis.}
 
@@ -435,7 +441,7 @@ CI.zyp <- c(confint.zyp(zyp.Year)[2,])
 The 95\% confidence interval using {\texttt confint(mblm.object)} was (\Sexpr{CI[1]}, \Sexpr{CI[2]}).
 The 95\% confidence interval using {\texttt zyp.confint(zyp.sen.object)} was (\Sexpr{CI.zyp[1]}, \Sexpr{CI.zyp[2]}).
 
-The widths are nearly the same, but the {\texttt confint(mblm())} confidence interval is shifted up slightly compared to the {\texttt zyp.confint()} confidence interval.
+The widths are nearly the same, but the {\texttt confint(mblm())} confidence interval is shifted up slightly compared to the {\texttt confint.zyp()} confidence interval. It is interesting that there is any difference as theoretically, they are both creating a 95\% confidence interval for the slope coefficient for the Theil-Sen estimate.
 
 
 \item%10
@@ -449,7 +455,8 @@ plot(PropDays ~ Year, data = Data1, type = "l", ylim = c(0,1),
      ylab = expression('Proportion of Days Below 32' *~degree*F))
 abline(lm.Year, lwd = 2)
 abline(model1s, col = "purple", lty = 2, lwd = 2)
-abline(a = zyp.Year$coefficients[1], b = zyp.Year$coefficients[2], col = "red", lty = 3, lwd = 2)
+abline(a = zyp.Year$coefficients[1], b = 
+         zyp.Year$coefficients[2], col = "red", lty = 3, lwd = 2)
 legend("topright", lwd = 2, lty = 1:3, col = c("black", "purple", "red"),
        legend = c("OLS", "Sen", "Zhang"))
 @
