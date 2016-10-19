@@ -101,7 +101,7 @@
 {\it Estimate a linear trend model for the proportion of measured days below freezing and report the parametric (t-test) linear trend test results in a sentence. Also discuss scope of inference for this test in a sentence or two (random sampling and random assignment and their implications).}
 
 % latex table generated in R 3.3.1 by xtable 1.8-2 package
-% Wed Oct 19 08:53:20 2016
+% Wed Oct 19 08:56:56 2016
 \begin{table}[H]
 \centering
 \caption{Estimated OLS linear trend model, residual SE = 0.032269} 
@@ -163,7 +163,7 @@ The Normal Q-Q plot shows some slight deviations from normality in the tails, bu
 {\it The Sen estimator or, more commonly, Theil-Sen is based on a single median of all the possible pairwise generated slopes. Its standard version is available in the ``mblm" (median based linear models) R package developed by Lukasz Komsta. The package description provides more details (\url{https://cran.r-project.org/web/packages/mblm/mblm.pdf}). Note that with `mblm`, you need to use ``repeated=FALSE" to get the Theil-Sen estimator and not the better estimator developed by Siegel. The package has a ``summary" function that provides a test based on the nonparametric Wilcox test but it had terrible Type I error rates when I explored it. Without further explorations, I would recommend avoiding its use. Fortunately, our permutation approach can be used to develop a test based on the Theil-Sen slope coefficient. First, compare the estimated slope provided by ``mblm" to what you found from the linear model and its permutation test. Then develop a permutation test based on the slope coefficient from `mblm` - note that ``mblm" conveniently has the same output structure as ``lm". The confidence interval that runs on ``mblm" seems to perform well enough to study, so we can make 95\% confidence intervals and check whether 0 is in the interval or not as the following code suggests to use it to perform our 5\% significance level hypothesis test.}
 
 % latex table generated in R 3.3.1 by xtable 1.8-2 package
-% Wed Oct 19 08:53:20 2016
+% Wed Oct 19 08:56:56 2016
 \begin{table}[H]
 \centering
 \caption{Estimated Sen linear trend model.} 
@@ -223,7 +223,7 @@ See page~\pageref{sixcode} for our simulation code. Based on 10,000 simulations 
 Procedure & Type I Error Rate \\
 \hline
 OLS $t$-test & 0.0516 \\
-OLS permutation test & 0.066 \\
+OLS permutation test & 0.0660 \\
 Sen CI & 0.0557
 \end{tabular}\end{center}
 

@@ -295,22 +295,21 @@ See page~\pageref{sixcode} for our simulation code. Based on 10,000 simulations 
 \begin{center}\begin{tabular}{lr}
 Procedure & Type I Error Rate \\
 \hline
-OLS $t$-test & \Sexpr{formatC(lm.noise_type1, digits = 4, format = "fg")} \\
-OLS permutation test & \Sexpr{formatC(lm.perm_type1, digits = 4, format = "fg")} \\
-Sen CI & \Sexpr{formatC(mblm.noise_type1, digits = 4, drop0trailing = FALSE)}
+OLS $t$-test & \Sexpr{sprintf("%.4f", lm.noise_type1)} \\
+OLS permutation test & \Sexpr{sprintf("%.4f", lm.perm_type1)} \\
+Sen CI & \Sexpr{sprintf("%.4f", mblm.noise_type1)}
 \end{tabular}\end{center}
 
 \item%7
 {\it Instead of white noise errors, we might also be interested in Type I error rates when we have autocorrelation present (again with no trend in the true process). Use the results for an AR(1) process variance (derived in class) to calculate the white noise variance needed to generate a process with the same variance as you used for your previous simulation, but when $\phi$=0.3 and 0.6. In other words, $\gamma_0$ of the AR(1) process needs to match the white noise variance used above and the white noise process driving the AR(1) process needs to be adjusted appropriately.}
 
-Let $\phi^{k}$ = the correlation between observations taken k time points apart (k lags apart), such that for time points 0 units apart, $\phi^{0}$ = 1.
-
-In class we derived that the variance at a given time point, Var($y_{t}$) = Cov($y_{t}$,$y_{t}$) = $\frac{\sigma^2_{e}}{(1-\phi^2)}$.
-
-
 \begin{enumerate}
 \item%7a
 {\it Show your derivation of the required white noise variances first for $\phi=0.3$ and $\phi=0.6$.}
+
+Let $\phi^{k}$ = the correlation between observations taken k time points apart (k lags apart), such that for time points 0 units apart, $\phi^{0}$ = 1.
+
+In class we derived that the variance at a given time point, Var($y_{t}$) = Cov($y_{t}$,$y_{t}$) = $\frac{\sigma^2_{e}}{(1-\phi^2)}$.
 
 {\bf Take residual standard error and input in here.}
 
