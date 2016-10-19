@@ -197,7 +197,7 @@ Based on 10,000 Permutations of Year",
 abline(v = model1s.coef, col = "purple")
 @
 
-However, I would question the validity of the confidence level set using {\texttt confint()} on an {\texttt mblm()} object. If there was strong evidence of an effect of temperature, at the 95\% confidence level, we would expect to ``reject" about 95\% of the time in the long run, meaning that approximately 95\% of confidence intervals, in the long run, should not contain 0. In this problem, we rejected the null, or found strong evidence that the 0 is not a plausible slope coefficient and the percentage of confidence intervals not containing 0 in 10,000 permutations using {\texttt mblm()} was \Sexpr{100#-pval} {\bf Extract the pvalue I had saved for this..... not sure how to do.}
+%However, I would question the validity of the confidence level set using {\texttt confint()} on an {\texttt mblm()} object. If there was strong evidence of an effect of temperature, at the 95\% confidence level, we would expect to ``reject" about 95\% of the time in the long run, meaning that approximately 95\% of confidence intervals, in the long run, should not contain 0. In this problem, we rejected the null, or found strong evidence that the 0 is not a plausible slope coefficient and the percentage of confidence intervals not containing 0 in 10,000 permutations using {\texttt mblm()} was \Sexpr{100#-pval} {\bf Extract the pvalue I had saved for this..... not sure how to do.}
 
 
 \item%6
@@ -336,6 +336,8 @@ $$\sigma^2_{0.6} = (1-0.6^2) \Sexpr{resid.se^2} = \Sexpr{(1-0.6^2) * resid.se^2}
 sig3 <- sqrt((1-0.3^2)) * resid.se
 sig6 <- sqrt((1-0.6^2)) * resid.se
 
+#arima.sim goes backwards, rather than estimating parameters, 
+#we set parameters and generate responses
 ar1sim<-arima.sim(n=2000,model=list(ar=c(0.3)),sd=sig3)
 var(ar1sim)
 
@@ -451,7 +453,7 @@ The widths are nearly the same, but the {\texttt confint(mblm())} confidence int
 \item%10
 {\it Make a plot of the original proportion response time series with the parametric linear, Theil-Sen, and Zhang methods$/$models on the same plot. You may want to use \verb|plot(y~x,type="l")| and then add lines to the plot.}
 
-Estimates from all three functions visually are very similar.
+Estimates from all three functions visually are very similar, which may be because we have yearly data and not monthly data. The three functions are all smooth.
 
 
 <<prob10>>=

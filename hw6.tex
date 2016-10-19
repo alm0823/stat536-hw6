@@ -1,0 +1,657 @@
+\documentclass[11pt]{article}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0, 0, 0}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.4,0.4,0.4}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{\textbf{#1}}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0,0,0}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0,0,0}{\textbf{#1}}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0,0,0}{\textbf{#1}}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0,0,0}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+\usepackage{fullpage,graphicx,float,amsmath,enumitem,hyperref}
+\setlist{parsep=5.5pt}
+\setlength{\parindent}{0pt}
+
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{Time Series HW 6}
+\rhead{Kenny Flagg \\ Andrea Mack}
+\setlength{\headheight}{24pt}
+\setlength{\headsep}{2pt}
+
+\title{Time Series HW 6}
+\author{Kenny Flagg \\ Andrea Mack}
+\date{October 18, 2016}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+\maketitle
+
+
+
+{\it We will explore one series like those you found in the Vincent and Meki's paper, but for Bozeman. The following code will count the days in Bozeman where the minimum temperature was measured to be below 32 degrees F (0 degrees C) and the number of days where information was available in ``Data1". }
+
+
+
+\begin{enumerate}
+
+\item%1
+{\it Make nice looking and labeled time series plots of the number of days below freezing and the proportion of measured days below freezing.}
+
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}
+
+{\centering \includegraphics[width=\maxwidth]{figure/prob1-1} 
+
+}
+
+
+
+
+{\centering \includegraphics[width=\maxwidth]{figure/prob1-2} 
+
+}
+
+
+
+\end{knitrout}
+
+
+\item%2
+{\it Estimate a linear trend model for the proportion of measured days below freezing and report the parametric (t-test) linear trend test results in a sentence. Also discuss scope of inference for this test in a sentence or two (random sampling and random assignment and their implications).}
+
+% latex table generated in R 3.3.1 by xtable 1.8-2 package
+% Wed Oct 19 09:49:12 2016
+\begin{table}[H]
+\centering
+\caption{Estimated OLS linear trend model, residual SE = 0.032269} 
+\begin{tabular}{rrrrr}
+  \hline
+ & Estimate & Std. Error & t value & Pr($>$$|$t$|$) \\ 
+  \hline
+(Intercept) & 1.0785 & 0.1920 & 5.62 & 0.0000 \\ 
+  Year & -0.0003 & 0.0001 & -3.17 & 0.0020 \\ 
+   \hline
+\end{tabular}
+\end{table}
+
+
+There is very strong evidence ($t = \ensuremath{-3.17}$, p-value = 0.001968) that year is associated with a linear trend in proportion of days below freezing. The estimated change is a decrease of 0.0312 days per 100 years in these years recorded at the spots in Bozeman where data were collected.
+
+Data were taken through an observational study and years were not randomly chosen, so as we tell the 216 students, we can only infer that time is \emph{associated} with a trend, not that the passage of time \emph{caused} the trend, and we can only infer that an association exists for these specific observed locations in the observed years, not for any other location in Bozeman or elsewhere, or for any other time period.
+
+
+\pagebreak
+\item%3
+{\it Discuss this proportion response versus using the count of days below zero per year, specific to this example and in general. What issues does using one or the other present?}
+
+Specific to these data, temperature was not recorded every day of each year. To report the number of days below $32^{o}F$ may be misleading if there is a large discrepancy in the total number of days temperature was recorded each year. The proportion of days may still be misleading depending on which days of the year temperature was recorded, but it puts each year on the same scale.
+
+\item%4
+{\it Generate a permutation test for the trend with the proportion response. I performed one in the syllabus (page 6) using the ``shuffle" function from the ``mosaic" package. Report a plot of the permutation distribution, the test statistic you used, and a p-value. Generally randomization based tests are more robust to violations of the normality assumption as long as the distribution (shape and variability) is the same for all observations except for differences in the center or mean. Why would that be advantageous with this response?}
+
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}
+
+{\centering \includegraphics[width=\maxwidth]{figure/prob4-1} 
+
+}
+
+
+
+\end{knitrout}
+
+The plot above shows the location of the observed result as a purple vertical line. 
+$$H_{o}: \beta_{Year} = 0$$
+$$H_{a}: \beta_{Year} \neq 0$$
+Based on 10,000 permutations, the test statistic of $\beta_{Year} = \ensuremath{-0.000312}$ has a p-value of 0.0018, which provides very strong evidence of a linear association between the year and the annual proportion of days below $32^{o}F$.
+
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}
+
+{\centering \includegraphics[width=\maxwidth]{figure/prob4x-1} 
+
+}
+
+
+
+\end{knitrout}
+
+The Normal Q-Q plot shows some slight deviations from normality in the tails, but they do not look serious. In this case, the residuals are approximately normmaly distribution so $t$-procudures are appropriate; however, we should be cautious because the response is a proportion. 
+
+In general, if the proportions tend to be close to the bounds of zero or one, the distribution could be skewed and so the $t$-test would not acheive its nominal type I error rate. The permutation test would be a better option in that situation because it does not require any particular distribution.
+
+\item%5
+{\it The Sen estimator or, more commonly, Theil-Sen is based on a single median of all the possible pairwise generated slopes. Its standard version is available in the ``mblm" (median based linear models) R package developed by Lukasz Komsta. The package description provides more details (\url{https://cran.r-project.org/web/packages/mblm/mblm.pdf}). Note that with `mblm`, you need to use ``repeated=FALSE" to get the Theil-Sen estimator and not the better estimator developed by Siegel. The package has a ``summary" function that provides a test based on the nonparametric Wilcox test but it had terrible Type I error rates when I explored it. Without further explorations, I would recommend avoiding its use. Fortunately, our permutation approach can be used to develop a test based on the Theil-Sen slope coefficient. First, compare the estimated slope provided by ``mblm" to what you found from the linear model and its permutation test. Then develop a permutation test based on the slope coefficient from `mblm` - note that ``mblm" conveniently has the same output structure as ``lm". The confidence interval that runs on ``mblm" seems to perform well enough to study, so we can make 95\% confidence intervals and check whether 0 is in the interval or not as the following code suggests to use it to perform our 5\% significance level hypothesis test.}
+
+% latex table generated in R 3.3.1 by xtable 1.8-2 package
+% Wed Oct 19 09:49:12 2016
+\begin{table}[H]
+\centering
+\caption{Estimated Sen linear trend model.} 
+\begin{tabular}{rrrrr}
+  \hline
+ & Estimate & MAD & V value & Pr($>$$|$V$|$) \\ 
+  \hline
+(Intercept) & 1.0857 & 0.0332 & 5995.00 & 0.0000 \\ 
+  Year & -0.0003 & 0.0015 & 6858653.50 & 0.0000 \\ 
+   \hline
+\end{tabular}
+\end{table}
+
+
+{\texttt lm()} gave an estimated slope coefficeint of \ensuremath{-0.000312} and {\texttt mblm()} gave an estimated slope coefficient of \ensuremath{-0.000316}.
+$$H_{o}: \beta_{Year.median} = 0$$
+$$H_{a}: \beta_{Year.median} \neq 0$$
+Using the same hypotheses from 4, but with the {\texttt mblm()} function estimating the median slope, and using 10,000 permutations, the test statistic of $\beta_{Year.median}\ensuremath{-0.000316}$ led to a two sided p-value of 0.0023. There is strong evidence that year is associated with a linear trend in annual proportion of days below $32^{o}F$.
+
+The median change in annual proportion of days below $32^{o}F$ is estimated to be a decrease of 0.0003161 $^\circ$F per year with an associated 95\% confidence interval for the decrease of 0.0003698$^\circ$F to 0.0002405$^\circ$F each subsequent year.
+
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}
+
+{\centering \includegraphics[width=\maxwidth]{figure/prop5x-1} 
+
+}
+
+
+
+\end{knitrout}
+
+%However, I would question the validity of the confidence level set using {\texttt confint()} on an {\texttt mblm()} object. If there was strong evidence of an effect of temperature, at the 95\% confidence level, we would expect to ``reject" about 95\% of the time in the long run, meaning that approximately 95\% of confidence intervals, in the long run, should not contain 0. In this problem, we rejected the null, or found strong evidence that the 0 is not a plausible slope coefficient and the percentage of confidence intervals not containing 0 in 10,000 permutations using {\texttt mblm()} was 100#-pval {\bf Extract the pvalue I had saved for this..... not sure how to do.}
+
+
+\item%6
+{\it Use the residual error variance estimate from your linear model for the proportion responses to simulate a series with no trend (constant mean and you can leave it at 0) and normal white noise with that same variance. Use that simulation code to perform a simulation study of the Type I error rate for the parametric t-test for the slope coefficient, the test using the confidence interval from ``mblm", and your permutation test (use 500 permutations and do 250 simulations to keep the run time somewhat manageable). Report the simulation-based Type I error rates when using a 5\% significance level test for the three procedures with the same sample size as the original data set.}
+
+
+
+
+\begin{itemize}
+\item%6a
+{\it For the parametric test, the p-value can be extracted from the ``lm"  model ``summary"'s using ``summary(model1)\$coef[2,4]".}
+
+\item%6b
+{\it It is best and easiest if you do one loop for the simulations and then for each simulated data set in each loop generate the three test results, extracting the p-values that each produces. If you struggle to set this up, please send me an email or stop by with an attempt at your code for some feedback.}
+
+\item%6c
+{\it This will be computationally intensive. To avoid needing to re-run results in R-markdown, you can try the ``cache=T" option for any of the permutation or simulation code chunks. Or for this section, you can just report the three error rates and comment out the code you used.}
+
+\end{itemize}
+
+See page~\pageref{sixcode} for our simulation code. Based on 10,000 simulations for the $t$-test and the Sen confidence interval procedure, and 1,000 simulations for the permutation test with 1,000 permutations, we came up with the following type I error rates.
+
+\begin{center}\begin{tabular}{lr}
+Procedure & Type I Error Rate \\
+\hline
+OLS $t$-test & 0.0516 \\
+OLS permutation test & 0.0660 \\
+Sen CI & 0.0557
+\end{tabular}\end{center}
+
+\item%7
+{\it Instead of white noise errors, we might also be interested in Type I error rates when we have autocorrelation present (again with no trend in the true process). Use the results for an AR(1) process variance (derived in class) to calculate the white noise variance needed to generate a process with the same variance as you used for your previous simulation, but when $\phi$=0.3 and 0.6. In other words, $\gamma_0$ of the AR(1) process needs to match the white noise variance used above and the white noise process driving the AR(1) process needs to be adjusted appropriately.}
+
+\begin{enumerate}
+\item%7a
+{\it Show your derivation of the required white noise variances first for $\phi=0.3$ and $\phi=0.6$.}
+
+Let $\phi^{k}$ = the correlation between observations taken k time points apart (k lags apart), such that for time points 0 units apart, $\phi^{0}$ = 1.
+
+In class we derived that the variance at a given time point, Var($y_{t}$) = Cov($y_{t}$,$y_{t}$) = $\frac{\sigma^2_{e}}{(1-\phi^2)}$.
+
+{\bf Take residual standard error and input in here.}
+
+White Noise Variance = $\sigma^2$
+
+In problem 2, we observed a residual variance of 0.0010413, so $0.0010413 = \dfrac{\sigma^2}{1-\phi^2}$. Solving for $\sigma^2$, the white noise variance is
+$$
+\sigma^2 = (1-\phi^2) 0.0010413.
+$$
+Now plugging in $\phi=0.3$ and $\phi=0.6$, we get
+$$\sigma^2_{0.3} = (1-0.3^2) 0.0010413 = 0.0009475$$
+and
+$$\sigma^2_{0.6} = (1-0.6^2) 0.0010413 = 0.0006664$$
+
+\item%7b
+{\it To simulate the process we can use this value in the ``arima.sim" function in something like ``arima.sim(n=2000,list(ar=c(0.3)),sd=5)" where ``n=2000" provides 2000 simulated observations, ``model=list(ar=c(0.3))" determines that we are using an AR(1) process with parameter of 0.3, and ``sd=5" controls the SD of the normal white noise used to build the AR(1) process (this is {\bf not} the variance of the AR(1) process). Check that you get about your expected results using something like:}
+
+
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{sig3} \hlkwb{<-} \hlkwd{sqrt}\hlstd{((}\hlnum{1}\hlopt{-}\hlnum{0.3}\hlopt{^}\hlnum{2}\hlstd{))} \hlopt{*} \hlstd{resid.se}
+\hlstd{sig6} \hlkwb{<-} \hlkwd{sqrt}\hlstd{((}\hlnum{1}\hlopt{-}\hlnum{0.6}\hlopt{^}\hlnum{2}\hlstd{))} \hlopt{*} \hlstd{resid.se}
+
+\hlcom{#arima.sim goes backwards, rather than estimating parameters, }
+\hlcom{#we set parameters and generate responses}
+\hlstd{ar1sim}\hlkwb{<-}\hlkwd{arima.sim}\hlstd{(}\hlkwc{n}\hlstd{=}\hlnum{2000}\hlstd{,}\hlkwc{model}\hlstd{=}\hlkwd{list}\hlstd{(}\hlkwc{ar}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{0.3}\hlstd{)),}\hlkwc{sd}\hlstd{=sig3)}
+\hlkwd{var}\hlstd{(ar1sim)}
+\end{alltt}
+\begin{verbatim}
+[1] 0.00104929
+\end{verbatim}
+\begin{alltt}
+\hlstd{ar1sim}\hlkwb{<-}\hlkwd{arima.sim}\hlstd{(}\hlkwc{n}\hlstd{=}\hlnum{2000}\hlstd{,}\hlkwc{model}\hlstd{=}\hlkwd{list}\hlstd{(}\hlkwc{ar}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{0.6}\hlstd{)),}\hlkwc{sd}\hlstd{=sig6)}
+\hlkwd{var}\hlstd{(ar1sim)} \hlcom{# about right :)}
+\end{alltt}
+\begin{verbatim}
+[1] 0.001104394
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+Variance of $y_t$ using $\phi=0.6$ = 0.0011044
+
+Residual variance from lm fit = 0.0010413
+
+\end{enumerate}
+
+\item%8
+{\it Repeat your simulation study of the parametric, permutation, and Theil-Sen linear trend test based on the CI. Report the estimated Type I error rates in the presence of AR(1) correlations with a parameter of 0.6 based on your work in the previous question for simulating the response time series. Discuss the impacts of having autocorrelation present on the various procedures.}
+
+
+
+lm $t$-test type I error rate: 0.3248
+
+mblm CI type I error rate: 0.3235
+
+lm permutation test type I error rate: 0.02
+
+The theoretical type I error rates are inflated, meaning find a spurious trend too often, and the permutation type I error rate was too small, making it have low power and it won't find trends often enough, assuming the 5\% type I error rate. Methods that incorporate autocorrelation structure in to the model may fix this.
+
+\item%9
+{\it The Zhang method you read about is also available in the ``zyp" package but it only provides confidence intervals and I am not completely convinced by their discussion of the intervals provided without more exploration. But you can get estimates from ``zyp.sen" and confidence intervals using ``confint.zyp" on the results from ``zyp.sen". The ``confint" function can also be applied to ``mblm" results. Find and compare the two confidence intervals for the Sen-estimators for the proportion response time series. No simulation study here - just complete the analysis.}
+
+
+
+
+
+The 95\% confidence interval using {\texttt confint(mblm.object)} was (\ensuremath{-0.0003698}, \ensuremath{-0.0002405}).
+The 95\% confidence interval using {\texttt zyp.confint(zyp.sen.object)} was (\ensuremath{-0.0005074}, \ensuremath{-0.0001099}).
+
+The widths are nearly the same, but the {\texttt confint(mblm())} confidence interval is shifted up slightly compared to the {\texttt confint.zyp()} confidence interval. It is interesting that there is any difference as theoretically, they are both creating a 95\% confidence interval for the slope coefficient for the Theil-Sen estimate.
+
+
+\item%10
+{\it Make a plot of the original proportion response time series with the parametric linear, Theil-Sen, and Zhang methods$/$models on the same plot. You may want to use \verb|plot(y~x,type="l")| and then add lines to the plot.}
+
+Estimates from all three functions visually are very similar, which may be because we have yearly data and not monthly data. The three functions are all smooth.
+
+
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}
+
+{\centering \includegraphics[width=\maxwidth]{figure/prob10-1} 
+
+}
+
+
+
+\end{knitrout}
+
+
+
+\end{enumerate}
+
+\appendix
+\section*{R Code}
+
+\begin{enumerate}
+
+\item%1
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{ggplot}\hlstd{(}\hlkwc{data} \hlstd{= Data1,} \hlkwd{aes}\hlstd{(}\hlkwc{x} \hlstd{= Year,} \hlkwc{y} \hlstd{= DaysBelow32))} \hlopt{+} \hlkwd{geom_point}\hlstd{()} \hlopt{+}
+  \hlkwd{scale_x_continuous}\hlstd{(}\hlkwc{breaks} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{seq}\hlstd{(}\hlkwd{min}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{Year)),}
+                                    \hlkwd{max}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{Year))}\hlopt{+}\hlnum{5}\hlstd{,} \hlkwc{by} \hlstd{=} \hlnum{5}\hlstd{)))} \hlopt{+}
+  \hlkwd{scale_y_continuous}\hlstd{(}\hlkwc{breaks} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{seq}\hlstd{(}\hlkwd{min}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{DaysBelow32)),}
+                                    \hlkwd{max}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{DaysBelow32))}\hlopt{+}\hlnum{5}\hlstd{,} \hlkwc{by} \hlstd{=} \hlnum{10}\hlstd{)))} \hlopt{+}
+  \hlkwd{theme_bw}\hlstd{()} \hlopt{+} \hlkwd{theme}\hlstd{(}\hlkwc{axis.text.x} \hlstd{=} \hlkwd{element_text}\hlstd{(}\hlkwc{angle} \hlstd{=} \hlnum{45}\hlstd{,} \hlkwc{hjust} \hlstd{=} \hlnum{1}\hlstd{))} \hlopt{+}
+  \hlkwd{labs}\hlstd{(}\hlkwc{title} \hlstd{=} \hlstr{'Annual Number of Days Below Freezing in Bozeman over Time'}\hlstd{)} \hlopt{+}
+  \hlkwd{ylab}\hlstd{(}\hlkwd{expression}\hlstd{(}\hlstr{'Days Below 32'}\hlopt{*}\hlstd{degree}\hlopt{*}\hlstd{F))}
+
+\hlkwd{ggplot}\hlstd{(}\hlkwc{data} \hlstd{= Data1,} \hlkwd{aes}\hlstd{(}\hlkwc{x} \hlstd{= Year,} \hlkwc{y} \hlstd{= PropDays))} \hlopt{+} \hlkwd{geom_point}\hlstd{()} \hlopt{+}
+  \hlkwd{scale_x_continuous}\hlstd{(}\hlkwc{breaks} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{seq}\hlstd{(}\hlkwd{min}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{Year)),}
+                                    \hlkwd{max}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{Year))}\hlopt{+}\hlnum{5}\hlstd{,} \hlkwc{by} \hlstd{=} \hlnum{5}\hlstd{)))} \hlopt{+}
+  \hlkwd{scale_y_continuous}\hlstd{(}\hlkwc{limits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{),} \hlkwc{breaks} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{seq}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{,} \hlkwc{by} \hlstd{=} \hlnum{0.1}\hlstd{)))} \hlopt{+}
+  \hlkwd{theme_bw}\hlstd{()} \hlopt{+} \hlkwd{theme}\hlstd{(}\hlkwc{axis.text.x} \hlstd{=} \hlkwd{element_text}\hlstd{(}\hlkwc{angle} \hlstd{=} \hlnum{45}\hlstd{,} \hlkwc{hjust} \hlstd{=} \hlnum{1}\hlstd{))} \hlopt{+}
+  \hlkwd{labs}\hlstd{(}\hlkwc{title} \hlstd{=} \hlstr{'Annual Proportion of Days Below Freezing in Bozeman over Time'}\hlstd{)} \hlopt{+}
+  \hlkwd{ylab}\hlstd{(}\hlkwd{expression}\hlstd{(}\hlstr{'Proportion of Days Below 32'}\hlopt{*}\hlstd{degree}\hlopt{*}\hlstd{F))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\item%2
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{lm.Year} \hlkwb{<-} \hlkwd{lm}\hlstd{(PropDays} \hlopt{~} \hlstd{Year,} \hlkwc{data} \hlstd{= Data1)}
+\hlstd{resid.se} \hlkwb{<-} \hlkwd{summary}\hlstd{(lm.Year)}\hlopt{$}\hlstd{sigma} \hlcom{# Save this for later}
+\hlkwd{xtable}\hlstd{(lm.Year,} \hlkwc{caption} \hlstd{=} \hlkwd{paste}\hlstd{(}\hlstr{"Estimated OLS linear trend model, residual SE ="}\hlstd{,} \hlkwd{signif}\hlstd{(resid.se,} \hlnum{5}\hlstd{)))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\addtocounter{enumi}{1}
+\item%4
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# I don't trust knitr's caching so I'm saving things manually.}
+\hlkwa{if}\hlstd{(}\hlkwd{file.exists}\hlstd{(}\hlstr{"prob4.Rdata"}\hlstd{))\{}
+  \hlkwd{load}\hlstd{(}\hlstr{"prob4.Rdata"}\hlstd{)}
+\hlstd{\}}\hlkwa{else}\hlstd{\{}
+  \hlcom{# Run in parallel.}
+  \hlcom{# Note: Most guidelines say don't use more than half of your CPU cores but whatevs...}
+  \hlstd{cl} \hlkwb{<-} \hlkwd{makeCluster}\hlstd{(}\hlkwd{detectCores}\hlstd{())}
+  \hlkwd{clusterExport}\hlstd{(cl,} \hlkwd{c}\hlstd{(}\hlstr{"Data1"}\hlstd{,} \hlstr{"shuffle"}\hlstd{))} \hlcom{# Load Data1 and mosaic::shuffle() on the nodes}
+  \hlstd{lm_perm} \hlkwb{<-} \hlkwd{parSapply}\hlstd{(cl,} \hlkwd{seq_len}\hlstd{(}\hlnum{10000}\hlstd{),} \hlkwa{function}\hlstd{(}\hlkwc{i}\hlstd{)\{} \hlcom{# seq_len(10000) is the same as 1:10000}
+    \hlkwd{return}\hlstd{(}\hlkwd{coef}\hlstd{(}\hlkwd{lm}\hlstd{(Data1}\hlopt{$}\hlstd{PropDays} \hlopt{~} \hlkwd{shuffle}\hlstd{(Data1}\hlopt{$}\hlstd{Year)))[}\hlnum{2}\hlstd{])}
+  \hlstd{\})}
+  \hlkwd{stopCluster}\hlstd{(cl)} \hlcom{# Stop this cluster and start with a clean environment next time}
+
+  \hlkwd{save}\hlstd{(lm_perm,} \hlkwc{file} \hlstd{=} \hlstr{"prob4.Rdata"}\hlstd{)}
+\hlstd{\}}
+
+\hlkwd{hist}\hlstd{(lm_perm,} \hlkwc{main} \hlstd{=} \hlstr{"Permutation Distribution of OLS Slope Estimates
+Based on 10,000 Permutations of Year"}\hlstd{,}
+     \hlkwc{xlab} \hlstd{=} \hlkwd{expression}\hlstd{(beta[Year]),} \hlkwc{ylab} \hlstd{=} \hlstr{"Probability"}\hlstd{,} \hlkwc{freq} \hlstd{=} \hlnum{FALSE}\hlstd{,} \hlkwc{breaks} \hlstd{=} \hlnum{50}\hlstd{)}
+\hlkwd{abline}\hlstd{(}\hlkwc{v} \hlstd{=} \hlkwd{coef}\hlstd{(lm.Year)[}\hlnum{2}\hlstd{],} \hlkwc{col} \hlstd{=} \hlstr{"purple"}\hlstd{)}
+
+\hlstd{perm_pvalue} \hlkwb{<-} \hlstd{(}\hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(lm_perm}\hlopt{<=}\hlkwd{coef}\hlstd{(lm.Year)[}\hlnum{2}\hlstd{]))} \hlopt{+} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(lm_perm}\hlopt{>=-}\hlkwd{coef}\hlstd{(lm.Year)[}\hlnum{2}\hlstd{])))} \hlopt{/}
+  \hlkwd{length}\hlstd{(lm_perm)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{par}\hlstd{(}\hlkwc{mfrow}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,}\hlnum{1}\hlstd{))}
+\hlkwd{plot}\hlstd{(lm.Year,} \hlkwc{which} \hlstd{=} \hlnum{2}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\item%5
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{model1s}\hlkwb{<-}\hlkwd{mblm}\hlstd{(PropDays}\hlopt{~}\hlstd{Year,}\hlkwc{data}\hlstd{=Data1,}\hlkwc{repeated}\hlstd{=F)}
+\hlstd{model1s.coef} \hlkwb{<-} \hlkwd{coef}\hlstd{(model1s)[}\hlnum{2}\hlstd{]}
+
+\hlkwd{xtable}\hlstd{(model1s,} \hlkwc{caption} \hlstd{=} \hlstr{"Estimated Sen linear trend model."}\hlstd{)}
+
+\hlstd{year} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwd{replicate}\hlstd{(}\hlnum{10000}\hlstd{,} \hlkwd{shuffle}\hlstd{(Data1}\hlopt{$}\hlstd{Year)))}
+\hlstd{shuffled.frame} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{pdays} \hlstd{= Data1}\hlopt{$}\hlstd{PropDays,}
+                             \hlkwc{suffled.year} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlkwd{as.numeric}\hlstd{(}\hlnum{NA}\hlstd{),} \hlnum{109}\hlstd{))}
+
+\hlkwa{if}\hlstd{(}\hlkwd{file.exists}\hlstd{(}\hlstr{"prob5.Rdata"}\hlstd{))\{}
+  \hlkwd{load}\hlstd{(}\hlstr{"prob5.Rdata"}\hlstd{)}
+\hlstd{\}}\hlkwa{else}\hlstd{\{}
+  \hlstd{cl} \hlkwb{<-} \hlkwd{makeCluster}\hlstd{(}\hlkwd{detectCores}\hlstd{())}
+  \hlkwd{clusterExport}\hlstd{(cl,} \hlkwd{c}\hlstd{(}\hlstr{"Data1"}\hlstd{,} \hlstr{"shuffled.frame"}\hlstd{,} \hlstr{"mblm"}\hlstd{))}
+  \hlstd{mblm.mod} \hlkwb{<-} \hlkwd{parCapply}\hlstd{(cl, year,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
+    \hlstd{shuffled.frame}\hlopt{$}\hlstd{year} \hlkwb{<-} \hlstd{x}
+    \hlkwd{return}\hlstd{(}\hlkwd{mblm}\hlstd{(pdays}\hlopt{~}\hlstd{year,} \hlkwc{data}\hlstd{=shuffled.frame,}\hlkwc{repeated} \hlstd{= F))}
+  \hlstd{\})}
+  \hlkwd{stopCluster}\hlstd{(cl)}
+
+  \hlcom{# Excercise for Andrea!}
+  \hlcom{# level of difficulty: 1 (after seeing mblm.mod of course ;) }
+  \hlstd{mblm.coeff} \hlkwb{<-} \hlkwd{sapply}\hlstd{(mblm.mod,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}\hlkwd{coef}\hlstd{(x)[}\hlnum{2}\hlstd{]\})}
+
+  \hlkwd{save}\hlstd{(mblm.coeff,} \hlkwc{file} \hlstd{=} \hlstr{"prob5.Rdata"}\hlstd{)}
+\hlstd{\}}
+
+\hlstd{pvalue.mblm} \hlkwb{<-} \hlkwd{length}\hlstd{(}\hlkwd{c}\hlstd{(}\hlkwd{which}\hlstd{(mblm.coeff}\hlopt{<=}\hlstd{model1s.coef),} \hlkwd{which}\hlstd{(mblm.coeff}\hlopt{>=-}\hlstd{model1s.coef)))} \hlopt{/}
+\hlkwd{length}\hlstd{(mblm.coeff)}
+
+
+\hlstd{CI}\hlkwb{<-}\hlkwd{confint}\hlstd{(model1s)[}\hlnum{2}\hlstd{,]} \hlcom{#Extract CI and check whether 0 is in interval}
+\hlcom{#(0>CI[1])&(0<CI[2]) #If 0 is in interval, FTR H0}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\item%6
+\label{sixcode}
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# first is lm}
+
+\hlstd{rand.noise} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwd{replicate}\hlstd{(}\hlnum{10000}\hlstd{,} \hlkwd{rnorm}\hlstd{(}\hlnum{109}\hlstd{,} \hlnum{0}\hlstd{, resid.se)))}
+\hlcom{#dim(rand.noise)# 109 rows}
+
+\hlkwa{if}\hlstd{(}\hlkwd{file.exists}\hlstd{(}\hlstr{"prob6t.Rdata"}\hlstd{))\{}
+  \hlkwd{load}\hlstd{(}\hlstr{"prob6t.Rdata"}\hlstd{)}
+\hlstd{\}}\hlkwa{else}\hlstd{\{}
+  \hlstd{cl} \hlkwb{<-} \hlkwd{makeCluster}\hlstd{(}\hlkwd{detectCores}\hlstd{())}
+  \hlkwd{clusterExport}\hlstd{(cl,} \hlkwd{c}\hlstd{(}\hlstr{"Data1"}\hlstd{))}
+  \hlstd{lm.noise} \hlkwb{<-} \hlkwd{parCapply}\hlstd{(cl, rand.noise,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
+    \hlcom{# Get the pvalues!}
+    \hlkwd{return}\hlstd{(}\hlkwd{summary}\hlstd{(}\hlkwd{lm}\hlstd{(x} \hlopt{~} \hlstd{Year,} \hlkwc{data} \hlstd{= Data1))}\hlopt{$}\hlstd{coefficients[}\hlstr{"Year"}\hlstd{,}\hlstr{"Pr(>|t|)"}\hlstd{])}
+  \hlstd{\})}
+  \hlkwd{stopCluster}\hlstd{(cl)}
+  \hlkwd{save}\hlstd{(lm.noise,} \hlkwc{file} \hlstd{=} \hlstr{"prob6t.Rdata"}\hlstd{)}
+\hlstd{\}}
+
+\hlcom{# Get proportion with small pvalues}
+\hlstd{lm.noise_type1} \hlkwb{<-} \hlkwd{mean}\hlstd{(lm.noise} \hlopt{<} \hlnum{0.05}\hlstd{)}
+
+
+\hlcom{# next is mblm}
+
+\hlstd{noise.frame} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{Year} \hlstd{= Data1}\hlopt{$}\hlstd{Year,} \hlkwc{out} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlkwd{as.numeric}\hlstd{(}\hlnum{NA}\hlstd{),} \hlnum{109}\hlstd{))}
+
+\hlkwa{if}\hlstd{(}\hlkwd{file.exists}\hlstd{(}\hlstr{"prob6m.Rdata"}\hlstd{))\{}
+  \hlkwd{load}\hlstd{(}\hlstr{"prob6m.Rdata"}\hlstd{)}
+\hlstd{\}}\hlkwa{else}\hlstd{\{}
+  \hlstd{cl} \hlkwb{<-} \hlkwd{makeCluster}\hlstd{(}\hlkwd{detectCores}\hlstd{())}
+  \hlkwd{clusterExport}\hlstd{(cl,} \hlkwd{c}\hlstd{(}\hlstr{"Data1"}\hlstd{,} \hlstr{"noise.frame"}\hlstd{,} \hlstr{"mblm"}\hlstd{))}
+  \hlstd{mblm.noise.reject} \hlkwb{<-} \hlkwd{parCapply}\hlstd{(cl, rand.noise,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
+    \hlstd{noise.frame}\hlopt{$}\hlstd{out} \hlkwb{<-} \hlstd{x}
+    \hlcom{# Is this where we use the CIs?}
+    \hlstd{CI}\hlkwb{<-}\hlkwd{confint}\hlstd{(}\hlkwd{mblm}\hlstd{(out}\hlopt{~}\hlstd{Year,} \hlkwc{data}\hlstd{=noise.frame,}\hlkwc{repeated} \hlstd{= F))[}\hlnum{2}\hlstd{,]}
+    \hlkwd{return}\hlstd{((}\hlnum{0} \hlopt{<} \hlstd{CI[}\hlnum{1}\hlstd{])} \hlopt{|} \hlstd{(}\hlnum{0} \hlopt{>} \hlstd{CI[}\hlnum{2}\hlstd{]))} \hlcom{# Is 0 outside the CI?}
+  \hlstd{\})}
+  \hlkwd{stopCluster}\hlstd{(cl)}
+  \hlkwd{save}\hlstd{(mblm.noise.reject,} \hlkwc{file} \hlstd{=} \hlstr{"prob6m.Rdata"}\hlstd{)}
+\hlstd{\}}
+
+\hlcom{# Get proportion with 0 outside the interval}
+\hlstd{mblm.noise_type1} \hlkwb{<-} \hlkwd{mean}\hlstd{(mblm.noise.reject)}
+
+
+\hlcom{# finally the permutation test}
+
+\hlkwa{if}\hlstd{(}\hlkwd{file.exists}\hlstd{(}\hlstr{"prob6p.Rdata"}\hlstd{))\{}
+  \hlkwd{load}\hlstd{(}\hlstr{"prob6p.Rdata"}\hlstd{)}
+\hlstd{\}}\hlkwa{else}\hlstd{\{}
+  \hlstd{cl} \hlkwb{<-} \hlkwd{makeCluster}\hlstd{(}\hlkwd{detectCores}\hlstd{())}
+  \hlkwd{clusterExport}\hlstd{(cl,} \hlkwd{c}\hlstd{(}\hlstr{"Data1"}\hlstd{,} \hlstr{"shuffle"}\hlstd{))}
+  \hlcom{# Loop for each simulated noise vector}
+  \hlstd{lm.perm.pvals} \hlkwb{<-} \hlkwd{parCapply}\hlstd{(cl, rand.noise[,}\hlnum{1}\hlopt{:}\hlnum{1000}\hlstd{],} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
+    \hlcom{# Get the "observed result" from fitting the ith dataset}
+    \hlstd{lm.slope} \hlkwb{<-} \hlkwd{coef}\hlstd{(}\hlkwd{lm}\hlstd{(x} \hlopt{~} \hlstd{Year,} \hlkwc{data} \hlstd{= Data1))[}\hlnum{2}\hlstd{]}
+
+    \hlcom{# Now loop to make a permutation distribution using this sim and suffled years}
+    \hlstd{lm.perms} \hlkwb{<-} \hlkwd{replicate}\hlstd{(}\hlnum{1000}\hlstd{,} \hlkwd{coef}\hlstd{(}\hlkwd{lm}\hlstd{(x} \hlopt{~} \hlkwd{shuffle}\hlstd{(Year),} \hlkwc{data} \hlstd{= Data1))[}\hlnum{2}\hlstd{])}
+
+    \hlcom{# Return pvalue}
+    \hlkwd{return}\hlstd{(}\hlkwd{mean}\hlstd{(}\hlkwd{abs}\hlstd{(lm.slope)} \hlopt{>} \hlkwd{abs}\hlstd{(lm.perms)))}
+  \hlstd{\})}
+  \hlkwd{stopCluster}\hlstd{(cl)}
+  \hlkwd{save}\hlstd{(lm.perm.pvals,} \hlkwc{file} \hlstd{=} \hlstr{"prob6p.Rdata"}\hlstd{)}
+\hlstd{\}}
+
+\hlcom{# Get proportion with small pvalues}
+\hlstd{lm.perm_type1} \hlkwb{<-} \hlkwd{mean}\hlstd{(lm.perm.pvals} \hlopt{<} \hlnum{0.05}\hlstd{)}
+
+
+\hlcom{# Note: We could combine these three simulations and have parSapply return a}
+\hlcom{# matrix of reject/not reject outcomes}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\item%7
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{sig3} \hlkwb{<-} \hlkwd{sqrt}\hlstd{((}\hlnum{1}\hlopt{-}\hlnum{0.3}\hlopt{^}\hlnum{2}\hlstd{))} \hlopt{*} \hlstd{resid.se}
+\hlstd{sig6} \hlkwb{<-} \hlkwd{sqrt}\hlstd{((}\hlnum{1}\hlopt{-}\hlnum{0.6}\hlopt{^}\hlnum{2}\hlstd{))} \hlopt{*} \hlstd{resid.se}
+
+\hlcom{#arima.sim goes backwards, rather than estimating parameters, }
+\hlcom{#we set parameters and generate responses}
+\hlstd{ar1sim}\hlkwb{<-}\hlkwd{arima.sim}\hlstd{(}\hlkwc{n}\hlstd{=}\hlnum{2000}\hlstd{,}\hlkwc{model}\hlstd{=}\hlkwd{list}\hlstd{(}\hlkwc{ar}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{0.3}\hlstd{)),}\hlkwc{sd}\hlstd{=sig3)}
+\hlkwd{var}\hlstd{(ar1sim)}
+
+\hlstd{ar1sim}\hlkwb{<-}\hlkwd{arima.sim}\hlstd{(}\hlkwc{n}\hlstd{=}\hlnum{2000}\hlstd{,}\hlkwc{model}\hlstd{=}\hlkwd{list}\hlstd{(}\hlkwc{ar}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{0.6}\hlstd{)),}\hlkwc{sd}\hlstd{=sig6)}
+\hlkwd{var}\hlstd{(ar1sim)} \hlcom{# about right :)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\item%8
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# first is lm}
+
+\hlstd{rand.ar1} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwd{replicate}\hlstd{(}\hlnum{10000}\hlstd{,} \hlkwd{arima.sim}\hlstd{(}\hlkwc{n}\hlstd{=}\hlnum{109}\hlstd{,}\hlkwc{model}\hlstd{=}\hlkwd{list}\hlstd{(}\hlkwc{ar}\hlstd{=}\hlkwd{c}\hlstd{(}\hlnum{0.6}\hlstd{)),}\hlkwc{sd}\hlstd{=sig6)))}
+
+\hlkwa{if}\hlstd{(}\hlkwd{file.exists}\hlstd{(}\hlstr{"prob8t.Rdata"}\hlstd{))\{}
+  \hlkwd{load}\hlstd{(}\hlstr{"prob8t.Rdata"}\hlstd{)}
+\hlstd{\}}\hlkwa{else}\hlstd{\{}
+  \hlstd{cl} \hlkwb{<-} \hlkwd{makeCluster}\hlstd{(}\hlkwd{detectCores}\hlstd{())}
+  \hlkwd{clusterExport}\hlstd{(cl,} \hlkwd{c}\hlstd{(}\hlstr{"Data1"}\hlstd{))}
+  \hlstd{lm.ar1} \hlkwb{<-} \hlkwd{parCapply}\hlstd{(cl, rand.ar1,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
+    \hlcom{# Get the pvalues!}
+    \hlkwd{return}\hlstd{(}\hlkwd{summary}\hlstd{(}\hlkwd{lm}\hlstd{(x} \hlopt{~} \hlstd{Year,} \hlkwc{data} \hlstd{= Data1))}\hlopt{$}\hlstd{coefficients[}\hlstr{"Year"}\hlstd{,}\hlstr{"Pr(>|t|)"}\hlstd{])}
+  \hlstd{\})}
+  \hlkwd{stopCluster}\hlstd{(cl)}
+  \hlkwd{save}\hlstd{(lm.ar1,} \hlkwc{file} \hlstd{=} \hlstr{"prob8t.Rdata"}\hlstd{)}
+\hlstd{\}}
+
+\hlcom{# Get proportion with small pvalues}
+\hlstd{lm.ar1_type1} \hlkwb{<-} \hlkwd{mean}\hlstd{(lm.ar1} \hlopt{<} \hlnum{0.05}\hlstd{)}
+
+
+\hlcom{# next is mblm}
+
+\hlstd{ar1.frame} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{Year} \hlstd{= Data1}\hlopt{$}\hlstd{Year,} \hlkwc{out} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlkwd{as.numeric}\hlstd{(}\hlnum{NA}\hlstd{),} \hlnum{109}\hlstd{))}
+
+\hlkwa{if}\hlstd{(}\hlkwd{file.exists}\hlstd{(}\hlstr{"prob8m.Rdata"}\hlstd{))\{}
+  \hlkwd{load}\hlstd{(}\hlstr{"prob8m.Rdata"}\hlstd{)}
+\hlstd{\}}\hlkwa{else}\hlstd{\{}
+  \hlstd{cl} \hlkwb{<-} \hlkwd{makeCluster}\hlstd{(}\hlkwd{detectCores}\hlstd{())}
+  \hlkwd{clusterExport}\hlstd{(cl,} \hlkwd{c}\hlstd{(}\hlstr{"Data1"}\hlstd{,} \hlstr{"ar1.frame"}\hlstd{,} \hlstr{"mblm"}\hlstd{))}
+  \hlstd{mblm.ar1.reject} \hlkwb{<-} \hlkwd{parCapply}\hlstd{(cl, rand.ar1,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
+    \hlstd{ar1.frame}\hlopt{$}\hlstd{out} \hlkwb{<-} \hlstd{x}
+    \hlcom{# Is this where we use the CIs?}
+    \hlstd{CI}\hlkwb{<-}\hlkwd{confint}\hlstd{(}\hlkwd{mblm}\hlstd{(out}\hlopt{~}\hlstd{Year,} \hlkwc{data}\hlstd{=ar1.frame,}\hlkwc{repeated} \hlstd{= F))[}\hlnum{2}\hlstd{,]}
+    \hlkwd{return}\hlstd{((}\hlnum{0} \hlopt{<} \hlstd{CI[}\hlnum{1}\hlstd{])} \hlopt{|} \hlstd{(}\hlnum{0} \hlopt{>} \hlstd{CI[}\hlnum{2}\hlstd{]))} \hlcom{# Is 0 outside the CI?}
+  \hlstd{\})}
+  \hlkwd{stopCluster}\hlstd{(cl)}
+  \hlkwd{save}\hlstd{(mblm.ar1.reject,} \hlkwc{file} \hlstd{=} \hlstr{"prob8m.Rdata"}\hlstd{)}
+\hlstd{\}}
+
+\hlcom{# Get proportion with 0 outside the interval}
+\hlstd{mblm.ar1_type1} \hlkwb{<-} \hlkwd{mean}\hlstd{(mblm.ar1.reject)}
+
+
+\hlcom{# finally the permutation test}
+
+\hlkwa{if}\hlstd{(}\hlkwd{file.exists}\hlstd{(}\hlstr{"prob8p.Rdata"}\hlstd{))\{}
+  \hlkwd{load}\hlstd{(}\hlstr{"prob8p.Rdata"}\hlstd{)}
+\hlstd{\}}\hlkwa{else}\hlstd{\{}
+  \hlstd{cl} \hlkwb{<-} \hlkwd{makeCluster}\hlstd{(}\hlkwd{detectCores}\hlstd{())}
+  \hlkwd{clusterExport}\hlstd{(cl,} \hlkwd{c}\hlstd{(}\hlstr{"Data1"}\hlstd{,} \hlstr{"shuffle"}\hlstd{))}
+  \hlcom{# Loop for each simulated noise vector}
+  \hlstd{lm.ar1.perm} \hlkwb{<-} \hlkwd{parCapply}\hlstd{(cl, rand.ar1[,}\hlnum{1}\hlopt{:}\hlnum{1000}\hlstd{],} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
+    \hlcom{# Get the "observed result" from fitting the ith dataset}
+    \hlstd{lm.slope} \hlkwb{<-} \hlkwd{coef}\hlstd{(}\hlkwd{lm}\hlstd{(x} \hlopt{~} \hlstd{Year,} \hlkwc{data} \hlstd{= Data1))[}\hlnum{2}\hlstd{]}
+
+    \hlcom{# Now loop to make a permutation distribution using this sim and suffled years}
+    \hlstd{lm.perms} \hlkwb{<-} \hlkwd{replicate}\hlstd{(}\hlnum{1000}\hlstd{,} \hlkwd{coef}\hlstd{(}\hlkwd{lm}\hlstd{(x} \hlopt{~} \hlkwd{shuffle}\hlstd{(Year),} \hlkwc{data} \hlstd{= Data1))[}\hlnum{2}\hlstd{])}
+
+    \hlcom{# Return pvalue}
+    \hlkwd{return}\hlstd{(}\hlkwd{mean}\hlstd{(}\hlkwd{abs}\hlstd{(lm.slope)} \hlopt{>} \hlkwd{abs}\hlstd{(lm.perms)))}
+  \hlstd{\})}
+  \hlkwd{stopCluster}\hlstd{(cl)}
+  \hlkwd{save}\hlstd{(lm.ar1.perm,} \hlkwc{file} \hlstd{=} \hlstr{"prob8p.Rdata"}\hlstd{)}
+\hlstd{\}}
+
+\hlcom{# Get proportion with small pvalues}
+\hlstd{lm.ar1.perm_type1} \hlkwb{<-} \hlkwd{mean}\hlstd{(lm.ar1.perm} \hlopt{<} \hlnum{0.05}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\item%9
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{zyp.Year} \hlkwb{<-} \hlkwd{zyp.sen}\hlstd{(PropDays} \hlopt{~} \hlstd{Year,} \hlkwc{data} \hlstd{= Data1)}
+
+\hlstd{CI.zyp} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlkwd{confint.zyp}\hlstd{(zyp.Year)[}\hlnum{2}\hlstd{,])}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+\item
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{plot}\hlstd{(PropDays} \hlopt{~} \hlstd{Year,} \hlkwc{data} \hlstd{= Data1,} \hlkwc{type} \hlstd{=} \hlstr{"l"}\hlstd{,} \hlkwc{ylim} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{),}
+     \hlkwc{ylab} \hlstd{=} \hlkwd{expression}\hlstd{(}\hlstr{'Proportion of Days Below 32'} \hlopt{*~}\hlstd{degree}\hlopt{*}\hlstd{F))}
+\hlkwd{abline}\hlstd{(lm.Year,} \hlkwc{lwd} \hlstd{=} \hlnum{2}\hlstd{)}
+\hlkwd{abline}\hlstd{(model1s,} \hlkwc{col} \hlstd{=} \hlstr{"purple"}\hlstd{,} \hlkwc{lty} \hlstd{=} \hlnum{2}\hlstd{,} \hlkwc{lwd} \hlstd{=} \hlnum{2}\hlstd{)}
+\hlkwd{abline}\hlstd{(}\hlkwc{a} \hlstd{= zyp.Year}\hlopt{$}\hlstd{coefficients[}\hlnum{1}\hlstd{],} \hlkwc{b} \hlstd{=}
+         \hlstd{zyp.Year}\hlopt{$}\hlstd{coefficients[}\hlnum{2}\hlstd{],} \hlkwc{col} \hlstd{=} \hlstr{"red"}\hlstd{,} \hlkwc{lty} \hlstd{=} \hlnum{3}\hlstd{,} \hlkwc{lwd} \hlstd{=} \hlnum{2}\hlstd{)}
+\hlkwd{legend}\hlstd{(}\hlstr{"topright"}\hlstd{,} \hlkwc{lwd} \hlstd{=} \hlnum{2}\hlstd{,} \hlkwc{lty} \hlstd{=} \hlnum{1}\hlopt{:}\hlnum{3}\hlstd{,} \hlkwc{col} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"black"}\hlstd{,} \hlstr{"purple"}\hlstd{,} \hlstr{"red"}\hlstd{),}
+       \hlkwc{legend} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"OLS"}\hlstd{,} \hlstr{"Sen"}\hlstd{,} \hlstr{"Zhang"}\hlstd{))}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\end{enumerate}
+
+
+\end{document}
