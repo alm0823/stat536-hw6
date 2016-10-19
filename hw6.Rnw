@@ -190,7 +190,7 @@ Using the same hypotheses from 4, but with the {\texttt mblm()} function estimat
 
 The median change in annual proportion of days below $32^{o}F$ is estimated to be a decrease of \Sexpr{-coef(model1s)[2]} $^\circ$F per year with an associated 95\% confidence interval for the decrease of \Sexpr{-CI[1]}$^\circ$F to \Sexpr{-CI[2]}$^\circ$F each subsequent year.
 
-<<prop5x>>=
+<<prob5x>>=
 hist(mblm.coeff, main = "Permutation Distribution of Sen Slope Estimates
 Based on 10,000 Permutations of Year",
      xlab = expression(beta[Year.median]), ylab = "Probability", freq = FALSE, breaks = 50)
@@ -292,7 +292,7 @@ lm.perm_type1 <- mean(lm.perm.pvals < 0.05)
 
 \end{itemize}
 
-See page~\pageref{sixcode} for our simulation code. Based on 10,000 simulations for the $t$-test and the Sen confidence interval procedure, and 1,000 simulations for the permutation test with 1,000 permutations, we came up with the following type I error rates.
+See page~\pageref{sixcode} for our simulation code. Based on 10,000 simulations for the $t$-test and the Sen confidence interval procedure, and 1,000 simulations for the permutation test with 1,000 permutations, we found the following type I error rates.
 
 \begin{center}\begin{tabular}{lr}
 Procedure & Type I Error Rate \\
@@ -311,11 +311,7 @@ Sen CI & \Sexpr{sprintf("%.4f", mblm.noise_type1)}
 
 Let $\phi^{k}$ = the correlation between observations taken k time points apart (k lags apart), such that for time points 0 units apart, $\phi^{0}$ = 1.
 
-In class we derived that the variance at a given time point, Var($y_{t}$) = Cov($y_{t}$,$y_{t}$) = $\frac{\sigma^2_{e}}{(1-\phi^2)}$.
-
-{\bf Take residual standard error and input in here.}
-
-White Noise Variance = $\sigma^2$
+In class we derived that the variance at a given time point, Var($y_{t}$) = Cov($y_{t}$,$y_{t}$) = $\frac{\sigma^2}{(1-\phi^2)}$.
 
 In problem 2, we observed a residual variance of \Sexpr{resid.se^2}, so $\Sexpr{resid.se^2} = \dfrac{\sigma^2}{1-\phi^2}$. Solving for $\sigma^2$, the white noise variance is
 $$
@@ -324,15 +320,13 @@ $$
 Now plugging in $\phi=0.3$ and $\phi=0.6$, we get
 $$\sigma^2_{0.3} = (1-0.3^2) \Sexpr{resid.se^2} = \Sexpr{(1-0.3^2) * resid.se^2}$$
 and
-$$\sigma^2_{0.6} = (1-0.6^2) \Sexpr{resid.se^2} = \Sexpr{(1-0.6^2) * resid.se^2}$$
+$$\sigma^2_{0.6} = (1-0.6^2) \Sexpr{resid.se^2} = \Sexpr{(1-0.6^2) * resid.se^2}.$$
 
 \item%7b
 {\it To simulate the process we can use this value in the ``arima.sim" function in something like ``arima.sim(n=2000,list(ar=c(0.3)),sd=5)" where ``n=2000" provides 2000 simulated observations, ``model=list(ar=c(0.3))" determines that we are using an AR(1) process with parameter of 0.3, and ``sd=5" controls the SD of the normal white noise used to build the AR(1) process (this is {\bf not} the variance of the AR(1) process). Check that you get about your expected results using something like:}
 
 
 <<prob7b, echo = TRUE>>=
-
-
 sig3 <- sqrt((1-0.3^2)) * resid.se
 sig6 <- sqrt((1-0.6^2)) * resid.se
 
@@ -345,9 +339,7 @@ ar1sim<-arima.sim(n=2000,model=list(ar=c(0.6)),sd=sig6)
 var(ar1sim) # about right :)
 @
 
-Variance of $y_t$ using $\phi=0.6$ = \Sexpr{var(ar1sim)}
-
-Residual variance from lm fit = \Sexpr{resid.se^2}
+Using a $\phi=0.6$, the variance of the simulated time series is \Sexpr{var(ar1sim)}. This is very close to the residual variance of \Sexpr{resid.se^2} from the \texttt{lm()} fit.
 
 \end{enumerate}
 
@@ -425,14 +417,20 @@ if(file.exists("prob8p.Rdata")){
 lm.ar1.perm_type1 <- mean(lm.ar1.perm < 0.05)
 @
 
-lm $t$-test type I error rate: \Sexpr{lm.ar1_type1}
+Our code is on page~\pageref{eightcode}. Based on 10,000 simulations for the $t$-test and the Sen confidence interval procedure, and 1,000 simulations for the permutation test with 1,000 permutations, these are the type I error rates we found.
 
-mblm CI type I error rate: \Sexpr{mblm.ar1_type1}
+\begin{center}\begin{tabular}{lrr}
+ & \multicolumn{2}{c}{Type I Error Rate} \\
+Procedure & No autocorrelation & Autocorrelation with $\phi=0.6$ \\
+\hline
+OLS $t$-test & \Sexpr{sprintf("%.4f", lm.noise_type1)} & \Sexpr{sprintf("%.4f", lm.ar1_type1)} \\
+OLS permutation test & \Sexpr{sprintf("%.4f", lm.perm_type1)} & \Sexpr{sprintf("%.4f", lm.ar1.perm_type1)} \\
+Sen CI & \Sexpr{sprintf("%.4f", mblm.noise_type1)} & \Sexpr{sprintf("%.4f", mblm.ar1_type1)}
+\end{tabular}\end{center}
 
-lm permutation test type I error rate: \Sexpr{lm.ar1.perm_type1}
+The $t$-test and Sen type I error rates are inflated, meaning they find a spurious trend too often, and the permutation type I error rate was too small, so it may also have low power and it won't find trends often enough, assuming the nominal 5\% type I error rate. Methods that incorporate autocorrelation structure into the model may fix this.
 
-The theoretical type I error rates are inflated, meaning find a spurious trend too often, and the permutation type I error rate was too small, making it have low power and it won't find trends often enough, assuming the 5\% type I error rate. Methods that incorporate autocorrelation structure in to the model may fix this.
-
+\pagebreak
 \item%9
 {\it The Zhang method you read about is also available in the ``zyp" package but it only provides confidence intervals and I am not completely convinced by their discussion of the intervals provided without more exploration. But you can get estimates from ``zyp.sen" and confidence intervals using ``confint.zyp" on the results from ``zyp.sen". The ``confint" function can also be applied to ``mblm" results. Find and compare the two confidence intervals for the Sen-estimators for the proportion response time series. No simulation study here - just complete the analysis.}
 
@@ -444,8 +442,7 @@ CI.zyp <- c(confint.zyp(zyp.Year)[2,])
 
 
 
-The 95\% confidence interval using {\texttt confint(mblm.object)} was (\Sexpr{CI[1]}, \Sexpr{CI[2]}).
-The 95\% confidence interval using {\texttt zyp.confint(zyp.sen.object)} was (\Sexpr{CI.zyp[1]}, \Sexpr{CI.zyp[2]}).
+The 95\% confidence interval using {\texttt confint(mblm.object)} was (\Sexpr{CI[1]}, \Sexpr{CI[2]}). The 95\% confidence interval using {\texttt zyp.confint(zyp.sen.object)} was (\Sexpr{CI.zyp[1]}, \Sexpr{CI.zyp[2]}).
 
 The widths are nearly the same, but the {\texttt confint(mblm())} confidence interval is shifted up slightly compared to the {\texttt confint.zyp()} confidence interval. It is interesting that there is any difference as theoretically, they are both creating a 95\% confidence interval for the slope coefficient for the Theil-Sen estimate.
 
@@ -453,12 +450,13 @@ The widths are nearly the same, but the {\texttt confint(mblm())} confidence int
 \item%10
 {\it Make a plot of the original proportion response time series with the parametric linear, Theil-Sen, and Zhang methods$/$models on the same plot. You may want to use \verb|plot(y~x,type="l")| and then add lines to the plot.}
 
-Estimates from all three functions visually are very similar, which may be because we have yearly data and not monthly data. The three functions are all smooth.
+Estimates from all three functions visually are very similar, which may be because we have yearly data and not monthly data. The three functions are all smooth because we did not estimate witin-year trends.
 
 
 <<prob10>>=
 plot(PropDays ~ Year, data = Data1, type = "l", ylim = c(0,1),
-     ylab = expression('Proportion of Days Below 32' *~degree*F))
+     main = "Estimated Linear Trends",
+     ylab = expression("Proportion of Days Below 32"*degree*F))
 abline(lm.Year, lwd = 2)
 abline(model1s, col = "purple", lty = 2, lwd = 2)
 abline(a = zyp.Year$coefficients[1], b = 
@@ -471,6 +469,7 @@ legend("topright", lwd = 2, lty = 1:3, col = c("black", "purple", "red"),
 
 \end{enumerate}
 
+\pagebreak
 \appendix
 \section*{R Code}
 
@@ -501,6 +500,7 @@ legend("topright", lwd = 2, lty = 1:3, col = c("black", "purple", "red"),
 <<prob7b, echo = TRUE, eval = FALSE>>=
 @
 \item%8
+\label{eightcode}
 <<prob8, echo = TRUE, eval = FALSE>>=
 @
 \item%9

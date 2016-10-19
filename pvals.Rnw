@@ -1,0 +1,23 @@
+\documentclass[11pt]{article}
+\usepackage{fullpage,graphicx,float,amsmath,enumitem,hyperref}
+
+\begin{document}
+
+<<pdists, echo = FALSE>>=
+load('prob6t.Rdata')
+load('prob6p.Rdata')
+load('prob8t.Rdata')
+load('prob8p.Rdata')
+
+par(mfrow=c(2,2))
+hist(lm.noise, breaks=50, main = 't-test p-values\nfrom independent obs')
+hist(lm.perm.pvals, breaks=50, main = 'permutation p-values\nfrom independent obs')
+hist(lm.ar1, breaks=50, main = 't-test p-values\nfrom correlated obs')
+hist(lm.ar1.perm, breaks=50, main = 'permutation p-values\nfrom correlated obs')
+@
+
+Both tests have type I error rate \(\approx\) 0.05 for the independent observations and the p-values look uniformly distributed.
+
+For the dependent observations, the $t$-test has an inflated type I error rate with lots of p-values near zero (because the SE is too big when we ignore dependency). The permutation test has lots of p-values of 1 where the median slope was 0 which is at the center of the permutation distribution. Does this make sense? There true slope is 0.
+
+\end{document}
