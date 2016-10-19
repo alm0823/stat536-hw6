@@ -57,7 +57,7 @@
 \pagestyle{fancy}
 \lhead{Time Series HW 6}
 \rhead{Kenny Flagg \\ Andrea Mack}
-\setlength{\headheight}{18pt}
+\setlength{\headheight}{24pt}
 \setlength{\headsep}{2pt}
 
 \title{Time Series HW 6}
@@ -70,6 +70,7 @@
 
 
 {\it We will explore one series like those you found in the Vincent and Meki's paper, but for Bozeman. The following code will count the days in Bozeman where the minimum temperature was measured to be below 32 degrees F (0 degrees C) and the number of days where information was available in ``Data1". }
+
 
 
 \begin{enumerate}
@@ -99,26 +100,40 @@
 \item%2
 {\it Estimate a linear trend model for the proportion of measured days below freezing and report the parametric (t-test) linear trend test results in a sentence. Also discuss scope of inference for this test in a sentence or two (random sampling and random assignment and their implications).}
 
+% latex table generated in R 3.3.1 by xtable 1.8-2 package
+% Wed Oct 19 08:53:20 2016
+\begin{table}[H]
+\centering
+\caption{Estimated OLS linear trend model, residual SE = 0.032269} 
+\begin{tabular}{rrrrr}
+  \hline
+ & Estimate & Std. Error & t value & Pr($>$$|$t$|$) \\ 
+  \hline
+(Intercept) & 1.0785 & 0.1920 & 5.62 & 0.0000 \\ 
+  Year & -0.0003 & 0.0001 & -3.17 & 0.0020 \\ 
+   \hline
+\end{tabular}
+\end{table}
 
 
-The true mean proportion of days below freezing was associated with a decrease of \ensuremath{-0.0003117} days per year in these years recorded at the spots in Bozeman data were collected.
+There is very strong evidence ($t = \ensuremath{-3.17}$, p-value = 0.001968) that year is associated with a linear trend in proportion of days below freezing. The estimated change is a decrease of 0.0312 days per 100 years in these years recorded at the spots in Bozeman where data were collected.
 
-Data were taken through an observational study and years were not randomly chosen, which is why we stated the conclusion using the wording ``associated" and ``in these years recorded at the spots in Bozeman data were collected". %as we teach our students to do...
+Data were taken through an observational study and years were not randomly chosen, so as we tell the 216 students, we can only infer that time is \emph{associated} with a trend, not that the passage of time \emph{caused} the trend, and we can only infer that an association exists for these specific observed locations in the observed years, not for any other location in Bozeman or elsewhere, or for any other time period.
 
+
+\pagebreak
 \item%3
 {\it Discuss this proportion response versus using the count of days below zero per year, specific to this example and in general. What issues does using one or the other present?}
 
-Specific in to these data, temperature was not recorded every day of each year.To report the number of days below $32^{o}F$ may be misleading if there is a large discrepancy in the total number of days temperature was recorded each year. The proportion of days may still be misleading depending on which days of the year temperature was recorded, but it puts each year on the same scale.
+Specific to these data, temperature was not recorded every day of each year. To report the number of days below $32^{o}F$ may be misleading if there is a large discrepancy in the total number of days temperature was recorded each year. The proportion of days may still be misleading depending on which days of the year temperature was recorded, but it puts each year on the same scale.
 
 \item%4
-{\it Generate a permutation test for the trend with the proportion response. I performed one in the syllabus (page 6) using the ``shuffle" function from the ``mosaic" package. Report a plot of the permutation distribution, the {\bf test statistic} you used, and a p-value. Generally randomization based tests are more robust to violations of the normality assumption as long as the distribution (shape and variability) is the same for all observations except for differences in the {\it center} or mean. Why would that be advantageous with this response?}
-
-
+{\it Generate a permutation test for the trend with the proportion response. I performed one in the syllabus (page 6) using the ``shuffle" function from the ``mosaic" package. Report a plot of the permutation distribution, the test statistic you used, and a p-value. Generally randomization based tests are more robust to violations of the normality assumption as long as the distribution (shape and variability) is the same for all observations except for differences in the center or mean. Why would that be advantageous with this response?}
 
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}
 
-{\centering \includegraphics[width=\maxwidth]{figure/prob4o-1} 
+{\centering \includegraphics[width=\maxwidth]{figure/prob4-1} 
 
 }
 
@@ -126,11 +141,10 @@ Specific in to these data, temperature was not recorded every day of each year.T
 
 \end{knitrout}
 
-$H_{o}$: $\beta_{Year}$ = 0
-
-$H_{a}$: $\beta_{Year} \neq$ 0
-
-Based on 10000 permutations, the resulted in a pvalue of 0.0018, from a test statistic of \ensuremath{-0.0003}, which is also the estimated slope from a model with the observed data.
+The plot above shows the location of the observed result as a purple vertical line. 
+$$H_{o}: \beta_{Year} = 0$$
+$$H_{a}: \beta_{Year} \neq 0$$
+Based on 10,000 permutations, the test statistic of $\beta_{Year} = \ensuremath{-0.000312}$ has a p-value of 0.0018, which provides very strong evidence of a linear association between the year and the annual proportion of days below $32^{o}F$.
 
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}
@@ -142,50 +156,58 @@ Based on 10000 permutations, the resulted in a pvalue of 0.0018, from a test sta
 
 
 \end{knitrout}
-The Normal Q-Q plot shows some slight deviations from normality in the tails. If the normality assumption is not met, the pvalues from the F tests for the coefficients in the model output may be incorrect. Because the residuals (and therefore the response) are not perfectly normally distributed, it may be advantageous to consider a test that is not based on the normality assumption, such as the permutation test.
+
+The Normal Q-Q plot shows some slight deviations from normality in the tails, but they do not look serious. In this case, the residuals are approximately normmaly distribution so $t$-procudures are appropriate; however, we should be cautious because the response is a proportion. If the proportions tend to be close to the bounds of zero or one, the distribution could be skewed and so the $t$-test would not acheive its nominal type I error rate. The permutation test would be a better option in that situation because it does not require any particular distribution.
 
 \item%5
 {\it The Sen estimator or, more commonly, Theil-Sen is based on a single median of all the possible pairwise generated slopes. Its standard version is available in the ``mblm" (median based linear models) R package developed by Lukasz Komsta. The package description provides more details (\url{https://cran.r-project.org/web/packages/mblm/mblm.pdf}). Note that with `mblm`, you need to use ``repeated=FALSE" to get the Theil-Sen estimator and not the better estimator developed by Siegel. The package has a ``summary" function that provides a test based on the nonparametric Wilcox test but it had terrible Type I error rates when I explored it. Without further explorations, I would recommend avoiding its use. Fortunately, our permutation approach can be used to develop a test based on the Theil-Sen slope coefficient. First, compare the estimated slope provided by ``mblm" to what you found from the linear model and its permutation test. Then develop a permutation test based on the slope coefficient from `mblm` - note that ``mblm" conveniently has the same output structure as ``lm". The confidence interval that runs on ``mblm" seems to perform well enough to study, so we can make 95\% confidence intervals and check whether 0 is in the interval or not as the following code suggests to use it to perform our 5\% significance level hypothesis test.}
 
-{\bf What does he mean by ``and its permutation test"? -- AM}
+% latex table generated in R 3.3.1 by xtable 1.8-2 package
+% Wed Oct 19 08:53:20 2016
+\begin{table}[H]
+\centering
+\caption{Estimated Sen linear trend model.} 
+\begin{tabular}{rrrrr}
+  \hline
+ & Estimate & MAD & V value & Pr($>$$|$V$|$) \\ 
+  \hline
+(Intercept) & 1.0857 & 0.0332 & 5995.00 & 0.0000 \\ 
+  Year & -0.0003 & 0.0015 & 6858653.50 & 0.0000 \\ 
+   \hline
+\end{tabular}
+\end{table}
+
+
+{\texttt lm()} gave an estimated slope coefficeint of \ensuremath{-0.000312} and {\texttt mblm()} gave an estimated slope coefficient of \ensuremath{-0.000316}.
+$$H_{o}: \beta_{Year.median} = 0$$
+$$H_{a}: \beta_{Year.median} \neq 0$$
+Using the same hypotheses from 4, but with the {\texttt mblm()} function estimating the median slope, and using 10,000 permutations, the test statistic of $\beta_{Year.median}\ensuremath{-0.000316}$ led to a two sided p-value of 0.0023. There is strong evidence that year is associated with a linear trend in annual proportion of days below $32^{o}F$.
+
+The median change in annual proportion of days below $32^{o}F$ is estimated to be a decrease of 0.0003161 $^\circ$F per year with an associated 95\% confidence interval for the decrease of 0.0003698$^\circ$F to 0.0002405$^\circ$F each subsequent year.
+
+\begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}
+
+{\centering \includegraphics[width=\maxwidth]{figure/prop5x-1} 
+
+}
 
 
 
+\end{knitrout}
 
-{\texttt lm()} gave an estimated slope coefficeint of \ensuremath{-0.0003117} and {\texttt mblm()} gave an estimated slope coefficient of \ensuremath{-0.0003161}.
-
-Using the same hypotheses from 4, but with the {\texttt mblm()} function fitting the model with the median response, the permutation test based on 10,000 iterations led to a pvalue of 0.0023 using the test statistic of the observed slope coefficient (\ensuremath{-0.0003161}) and the null hypothesis of no relationship between year and temperature. The explicit hypotheses are stated below. There is strong evidence that year had an effect on median temperature in these data. 
-$H_{o}$: $\beta_{Year.median}$ = 0
-
-$H_{a}$: $\beta_{Year.median} \neq$ 0
-
-It is estimated that the median temperature in this data set decreased by \ensuremath{-0.0003161} $^\circ$F each year with an associated 95\% confidence interval of \ensuremath{-0.0003698} to \ensuremath{-0.0002405} $^\circ$F.
-
-However, I would question the validity of the confidence level set using {\texttt confint()} on an {\texttt mblm()} object. If there was strong evidence of an effect of temperature, at the 95\% confidence level, we would expect to ``reject" 5\% of the time, meaning that approximately 5\% of confidence intervals, in the long run, should contain 0.
+However, I would question the validity of the confidence level set using {\texttt confint()} on an {\texttt mblm()} object. If there was strong evidence of an effect of temperature, at the 95\% confidence level, we would expect to ``reject" about 95\% of the time in the long run, meaning that approximately 95\% of confidence intervals, in the long run, should not contain 0. In this problem, we rejected the null, or found strong evidence that the 0 is not a plausible slope coefficient and the percentage of confidence intervals not containing 0 in 10,000 permutations using {\texttt mblm()} was 100 {\bf Extract the pvalue I had saved for this..... not sure how to do.}
 
 
 \item%6
 {\it Use the residual error variance estimate from your linear model for the proportion responses to simulate a series with no trend (constant mean and you can leave it at 0) and normal white noise with that same variance. Use that simulation code to perform a simulation study of the Type I error rate for the parametric t-test for the slope coefficient, the test using the confidence interval from ``mblm", and your permutation test (use 500 permutations and do 250 simulations to keep the run time somewhat manageable). Report the simulation-based Type I error rates when using a 5\% significance level test for the three procedures with the same sample size as the original data set.}
 
-I assume we use $\alpha=0.05$?
-
-{\bf I don't understand what the permutation test is for. I can do a permutation test, but I don' t know what he wants us to test.} \emph{We're evalauating the Type I error rate of the permutation test on fake data with no trend.}
 
 
-
-lm $t$-test type I error rate: 0.0516
-
-mblm CI type I error rate: 0.0557
-
-lm permutation test type I error rate: 0.066
-
-{\bf Re-do everything, but with the random noise responses rather than the obesrved data.}
 
 \begin{itemize}
 \item%6a
 {\it For the parametric test, the p-value can be extracted from the ``lm"  model ``summary"'s using ``summary(model1)\$coef[2,4]".}
-
-
 
 \item%6b
 {\it It is best and easiest if you do one loop for the simulations and then for each simulated data set in each loop generate the three test results, extracting the p-values that each produces. If you struggle to set this up, please send me an email or stop by with an attempt at your code for some feedback.}
@@ -194,6 +216,16 @@ lm permutation test type I error rate: 0.066
 {\it This will be computationally intensive. To avoid needing to re-run results in R-markdown, you can try the ``cache=T" option for any of the permutation or simulation code chunks. Or for this section, you can just report the three error rates and comment out the code you used.}
 
 \end{itemize}
+
+See page~\pageref{sixcode} for our simulation code. Based on 10,000 simulations for the $t$-test and the Sen confidence interval procedure, and 1,000 simulations for the permutation test with 1,000 permutations, we came up with the following type I error rates.
+
+\begin{center}\begin{tabular}{lr}
+Procedure & Type I Error Rate \\
+\hline
+OLS $t$-test & 0.0516 \\
+OLS permutation test & 0.066 \\
+Sen CI & 0.0557
+\end{tabular}\end{center}
 
 \item%7
 {\it Instead of white noise errors, we might also be interested in Type I error rates when we have autocorrelation present (again with no trend in the true process). Use the results for an AR(1) process variance (derived in class) to calculate the white noise variance needed to generate a process with the same variance as you used for your previous simulation, but when $\phi$=0.3 and 0.6. In other words, $\gamma_0$ of the AR(1) process needs to match the white noise variance used above and the white noise process driving the AR(1) process needs to be adjusted appropriately.}
@@ -218,12 +250,10 @@ $$
 Now plugging in $\phi=0.3$ and $\phi=0.6$, we get
 $$\sigma^2_{0.3} = (1-0.3^2) 0.0010413 = 0.0009475$$
 and
-$$\sigma^2_{0.6} = (1-0.3^2) 0.0010413 = 0.0006664$$
+$$\sigma^2_{0.6} = (1-0.6^2) 0.0010413 = 0.0006664$$
 
 \item%7b
-{\it To simulate the process we can use this value in the ``arima.sim" function in something like ``arima.sim(n=2000,list(ar=c(0.3)),sd=5)" where ``n=2000" provides 2000 simulated observations, ``model=list(ar=c(0.3))" determines that we are using an AR(1) process with parameter of of 0.3, and ``sd=5" controls the SD of the normal white noise used to build the AR(1) process (this is {\bf not} the variance of the AR(1) process). Check that you get about your expected results using something like:}
-
-{\bf I must be doing something wrong, these are completely off.}
+{\it To simulate the process we can use this value in the ``arima.sim" function in something like ``arima.sim(n=2000,list(ar=c(0.3)),sd=5)" where ``n=2000" provides 2000 simulated observations, ``model=list(ar=c(0.3))" determines that we are using an AR(1) process with parameter of 0.3, and ``sd=5" controls the SD of the normal white noise used to build the AR(1) process (this is {\bf not} the variance of the AR(1) process). Check that you get about your expected results using something like:}
 
 
 \begin{knitrout}\footnotesize
@@ -265,6 +295,8 @@ mblm CI type I error rate: 0.3235
 
 lm permutation test type I error rate: 0.02
 
+We see that the permutation test is resistent to the induced correlation structure while the theoretical test and CI are not. The permutation test does not have the independent error assumptions required by the theoretical test and CI, resulting in the increased error rate.
+
 \item%9
 {\it The Zhang method you read about is also available in the ``zyp" package but it only provides confidence intervals and I am not completely convinced by their discussion of the intervals provided without more exploration. But you can get estimates from ``zyp.sen" and confidence intervals using ``confint.zyp" on the results from ``zyp.sen". The ``confint" function can also be applied to ``mblm" results. Find and compare the two confidence intervals for the Sen-estimators for the proportion response time series. No simulation study here - just complete the analysis.}
 
@@ -275,7 +307,7 @@ lm permutation test type I error rate: 0.02
 The 95\% confidence interval using {\texttt confint(mblm.object)} was (\ensuremath{-0.0003698}, \ensuremath{-0.0002405}).
 The 95\% confidence interval using {\texttt zyp.confint(zyp.sen.object)} was (\ensuremath{-0.0005074}, \ensuremath{-0.0001099}).
 
-The widths are nearly the same, but the {\texttt confint(mblm())} confidence interval is shifted up slightly compared to the {\texttt zyp.confint()} confidence interval.
+The widths are nearly the same, but the {\texttt confint(mblm())} confidence interval is shifted up slightly compared to the {\texttt confint.zyp()} confidence interval. It is interesting that there is any difference as theoretically, they are both creating a 95\% confidence interval for the slope coefficient for the Theil-Sen estimate.
 
 
 \item%10
@@ -308,19 +340,22 @@ Estimates from all three functions visually are very similar.
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
 \begin{alltt}
- \hlkwd{ggplot}\hlstd{(}\hlkwc{data} \hlstd{= Data1,} \hlkwd{aes}\hlstd{(}\hlkwc{x} \hlstd{= Year,} \hlkwc{y} \hlstd{= DaysBelow32))} \hlopt{+} \hlkwd{geom_point}\hlstd{()} \hlopt{+}
-  \hlkwd{scale_x_continuous}\hlstd{(}\hlkwc{breaks} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{seq}\hlstd{(}\hlkwd{min}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{Year)),}\hlkwd{max}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{Year))}\hlopt{+}\hlnum{5}\hlstd{,} \hlkwc{by} \hlstd{=} \hlnum{5}\hlstd{)))} \hlopt{+}
-  \hlkwd{scale_y_continuous}\hlstd{(}\hlkwc{breaks} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{seq}\hlstd{(}\hlkwd{min}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{DaysBelow32)),}\hlkwd{max}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{DaysBelow32))}\hlopt{+}\hlnum{5}\hlstd{,} \hlkwc{by} \hlstd{=} \hlnum{10}\hlstd{)))} \hlopt{+}
+\hlkwd{ggplot}\hlstd{(}\hlkwc{data} \hlstd{= Data1,} \hlkwd{aes}\hlstd{(}\hlkwc{x} \hlstd{= Year,} \hlkwc{y} \hlstd{= DaysBelow32))} \hlopt{+} \hlkwd{geom_point}\hlstd{()} \hlopt{+}
+  \hlkwd{scale_x_continuous}\hlstd{(}\hlkwc{breaks} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{seq}\hlstd{(}\hlkwd{min}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{Year)),}
+                                    \hlkwd{max}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{Year))}\hlopt{+}\hlnum{5}\hlstd{,} \hlkwc{by} \hlstd{=} \hlnum{5}\hlstd{)))} \hlopt{+}
+  \hlkwd{scale_y_continuous}\hlstd{(}\hlkwc{breaks} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{seq}\hlstd{(}\hlkwd{min}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{DaysBelow32)),}
+                                    \hlkwd{max}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{DaysBelow32))}\hlopt{+}\hlnum{5}\hlstd{,} \hlkwc{by} \hlstd{=} \hlnum{10}\hlstd{)))} \hlopt{+}
   \hlkwd{theme_bw}\hlstd{()} \hlopt{+} \hlkwd{theme}\hlstd{(}\hlkwc{axis.text.x} \hlstd{=} \hlkwd{element_text}\hlstd{(}\hlkwc{angle} \hlstd{=} \hlnum{45}\hlstd{,} \hlkwc{hjust} \hlstd{=} \hlnum{1}\hlstd{))} \hlopt{+}
-  \hlkwd{labs}\hlstd{(}\hlkwc{title} \hlstd{=} \hlstr{'Bozeman Weather Data'}\hlstd{)} \hlopt{+}
-  \hlkwd{ylab}\hlstd{(}\hlkwd{expression}\hlstd{(}\hlstr{'Days Below 32'} \hlopt{*~}\hlstd{degree}\hlopt{*}\hlstd{F))}
+  \hlkwd{labs}\hlstd{(}\hlkwc{title} \hlstd{=} \hlstr{'Annual Number of Days Below Freezing in Bozeman over Time'}\hlstd{)} \hlopt{+}
+  \hlkwd{ylab}\hlstd{(}\hlkwd{expression}\hlstd{(}\hlstr{'Days Below 32'}\hlopt{*}\hlstd{degree}\hlopt{*}\hlstd{F))}
 
 \hlkwd{ggplot}\hlstd{(}\hlkwc{data} \hlstd{= Data1,} \hlkwd{aes}\hlstd{(}\hlkwc{x} \hlstd{= Year,} \hlkwc{y} \hlstd{= PropDays))} \hlopt{+} \hlkwd{geom_point}\hlstd{()} \hlopt{+}
-  \hlkwd{scale_x_continuous}\hlstd{(}\hlkwc{breaks} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{seq}\hlstd{(}\hlkwd{min}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{Year)),}\hlkwd{max}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{Year))}\hlopt{+}\hlnum{5}\hlstd{,} \hlkwc{by} \hlstd{=} \hlnum{5}\hlstd{)))} \hlopt{+}
+  \hlkwd{scale_x_continuous}\hlstd{(}\hlkwc{breaks} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{seq}\hlstd{(}\hlkwd{min}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{Year)),}
+                                    \hlkwd{max}\hlstd{(}\hlkwd{as.numeric}\hlstd{(Data1}\hlopt{$}\hlstd{Year))}\hlopt{+}\hlnum{5}\hlstd{,} \hlkwc{by} \hlstd{=} \hlnum{5}\hlstd{)))} \hlopt{+}
   \hlkwd{scale_y_continuous}\hlstd{(}\hlkwc{limits} \hlstd{=} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{),} \hlkwc{breaks} \hlstd{=} \hlkwd{c}\hlstd{(}\hlkwd{seq}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{,} \hlkwc{by} \hlstd{=} \hlnum{0.1}\hlstd{)))} \hlopt{+}
   \hlkwd{theme_bw}\hlstd{()} \hlopt{+} \hlkwd{theme}\hlstd{(}\hlkwc{axis.text.x} \hlstd{=} \hlkwd{element_text}\hlstd{(}\hlkwc{angle} \hlstd{=} \hlnum{45}\hlstd{,} \hlkwc{hjust} \hlstd{=} \hlnum{1}\hlstd{))} \hlopt{+}
-  \hlkwd{labs}\hlstd{(}\hlkwc{title} \hlstd{=} \hlstr{'Bozeman Weather Data'}\hlstd{)} \hlopt{+}
-  \hlkwd{ylab}\hlstd{(}\hlkwd{expression}\hlstd{(}\hlstr{'Proportion of Days Below 32'} \hlopt{*~}\hlstd{degree}\hlopt{*}\hlstd{F))}
+  \hlkwd{labs}\hlstd{(}\hlkwc{title} \hlstd{=} \hlstr{'Annual Proportion of Days Below Freezing in Bozeman over Time'}\hlstd{)} \hlopt{+}
+  \hlkwd{ylab}\hlstd{(}\hlkwd{expression}\hlstd{(}\hlstr{'Proportion of Days Below 32'}\hlopt{*}\hlstd{degree}\hlopt{*}\hlstd{F))}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
@@ -330,6 +365,7 @@ Estimates from all three functions visually are very similar.
 \begin{alltt}
 \hlstd{lm.Year} \hlkwb{<-} \hlkwd{lm}\hlstd{(PropDays} \hlopt{~} \hlstd{Year,} \hlkwc{data} \hlstd{= Data1)}
 \hlstd{resid.se} \hlkwb{<-} \hlkwd{summary}\hlstd{(lm.Year)}\hlopt{$}\hlstd{sigma} \hlcom{# Save this for later}
+\hlkwd{xtable}\hlstd{(lm.Year,} \hlkwc{caption} \hlstd{=} \hlkwd{paste}\hlstd{(}\hlstr{"Estimated OLS linear trend model, residual SE ="}\hlstd{,} \hlkwd{signif}\hlstd{(resid.se,} \hlnum{5}\hlstd{)))}
 \end{alltt}
 \end{kframe}
 \end{knitrout}
@@ -353,14 +389,10 @@ Estimates from all three functions visually are very similar.
 
   \hlkwd{save}\hlstd{(lm_perm,} \hlkwc{file} \hlstd{=} \hlstr{"prob4.Rdata"}\hlstd{)}
 \hlstd{\}}
-\end{alltt}
-\end{kframe}
-\end{knitrout}
-\begin{knitrout}\footnotesize
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{alltt}
-\hlkwd{hist}\hlstd{(lm_perm,} \hlkwc{main} \hlstd{=} \hlstr{"Histogram of 10000 Permutations of \textbackslash{}n Year and Resulting \textbackslash{}n LM Slope Coefficients"}\hlstd{,}
-     \hlkwc{xlab} \hlstd{=} \hlkwd{expression}\hlstd{(beta[Year]),} \hlkwc{ylab} \hlstd{=} \hlstr{"Count"}\hlstd{,} \hlkwc{breaks} \hlstd{=} \hlnum{50}\hlstd{)}
+
+\hlkwd{hist}\hlstd{(lm_perm,} \hlkwc{main} \hlstd{=} \hlstr{"Permutation Distribution of OLS Slope Estimates
+Based on 10,000 Permutations of Year"}\hlstd{,}
+     \hlkwc{xlab} \hlstd{=} \hlkwd{expression}\hlstd{(beta[Year]),} \hlkwc{ylab} \hlstd{=} \hlstr{"Probability"}\hlstd{,} \hlkwc{freq} \hlstd{=} \hlnum{FALSE}\hlstd{,} \hlkwc{breaks} \hlstd{=} \hlnum{50}\hlstd{)}
 \hlkwd{abline}\hlstd{(}\hlkwc{v} \hlstd{=} \hlkwd{coef}\hlstd{(lm.Year)[}\hlnum{2}\hlstd{],} \hlkwc{col} \hlstd{=} \hlstr{"purple"}\hlstd{)}
 
 \hlstd{perm_pvalue} \hlkwb{<-} \hlstd{(}\hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(lm_perm}\hlopt{<=}\hlkwd{coef}\hlstd{(lm.Year)[}\hlnum{2}\hlstd{]))} \hlopt{+} \hlkwd{length}\hlstd{(}\hlkwd{which}\hlstd{(lm_perm}\hlopt{>=-}\hlkwd{coef}\hlstd{(lm.Year)[}\hlnum{2}\hlstd{])))} \hlopt{/}
@@ -383,8 +415,11 @@ Estimates from all three functions visually are very similar.
 \hlstd{model1s}\hlkwb{<-}\hlkwd{mblm}\hlstd{(PropDays}\hlopt{~}\hlstd{Year,}\hlkwc{data}\hlstd{=Data1,}\hlkwc{repeated}\hlstd{=F)}
 \hlstd{model1s.coef} \hlkwb{<-} \hlkwd{coef}\hlstd{(model1s)[}\hlnum{2}\hlstd{]}
 
+\hlkwd{xtable}\hlstd{(model1s,} \hlkwc{caption} \hlstd{=} \hlstr{"Estimated Sen linear trend model."}\hlstd{)}
+
 \hlstd{year} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwd{replicate}\hlstd{(}\hlnum{10000}\hlstd{,} \hlkwd{shuffle}\hlstd{(Data1}\hlopt{$}\hlstd{Year)))}
-\hlstd{shuffled.frame} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{pdays} \hlstd{= Data1}\hlopt{$}\hlstd{PropDays,} \hlkwc{suffled.year} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlkwd{as.numeric}\hlstd{(}\hlnum{NA}\hlstd{),} \hlnum{109}\hlstd{))}
+\hlstd{shuffled.frame} \hlkwb{<-} \hlkwd{data.frame}\hlstd{(}\hlkwc{pdays} \hlstd{= Data1}\hlopt{$}\hlstd{PropDays,}
+                             \hlkwc{suffled.year} \hlstd{=} \hlkwd{rep}\hlstd{(}\hlkwd{as.numeric}\hlstd{(}\hlnum{NA}\hlstd{),} \hlnum{109}\hlstd{))}
 
 \hlkwa{if}\hlstd{(}\hlkwd{file.exists}\hlstd{(}\hlstr{"prob5.Rdata"}\hlstd{))\{}
   \hlkwd{load}\hlstd{(}\hlstr{"prob5.Rdata"}\hlstd{)}
@@ -413,7 +448,9 @@ Estimates from all three functions visually are very similar.
 \end{alltt}
 \end{kframe}
 \end{knitrout}
+
 \item%6
+\label{sixcode}
 \begin{knitrout}\footnotesize
 \definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
 \begin{alltt}
@@ -601,7 +638,8 @@ Estimates from all three functions visually are very similar.
      \hlkwc{ylab} \hlstd{=} \hlkwd{expression}\hlstd{(}\hlstr{'Proportion of Days Below 32'} \hlopt{*~}\hlstd{degree}\hlopt{*}\hlstd{F))}
 \hlkwd{abline}\hlstd{(lm.Year,} \hlkwc{lwd} \hlstd{=} \hlnum{2}\hlstd{)}
 \hlkwd{abline}\hlstd{(model1s,} \hlkwc{col} \hlstd{=} \hlstr{"purple"}\hlstd{,} \hlkwc{lty} \hlstd{=} \hlnum{2}\hlstd{,} \hlkwc{lwd} \hlstd{=} \hlnum{2}\hlstd{)}
-\hlkwd{abline}\hlstd{(}\hlkwc{a} \hlstd{= zyp.Year}\hlopt{$}\hlstd{coefficients[}\hlnum{1}\hlstd{],} \hlkwc{b} \hlstd{= zyp.Year}\hlopt{$}\hlstd{coefficients[}\hlnum{2}\hlstd{],} \hlkwc{col} \hlstd{=} \hlstr{"red"}\hlstd{,} \hlkwc{lty} \hlstd{=} \hlnum{3}\hlstd{,} \hlkwc{lwd} \hlstd{=} \hlnum{2}\hlstd{)}
+\hlkwd{abline}\hlstd{(}\hlkwc{a} \hlstd{= zyp.Year}\hlopt{$}\hlstd{coefficients[}\hlnum{1}\hlstd{],} \hlkwc{b} \hlstd{=}
+         \hlstd{zyp.Year}\hlopt{$}\hlstd{coefficients[}\hlnum{2}\hlstd{],} \hlkwc{col} \hlstd{=} \hlstr{"red"}\hlstd{,} \hlkwc{lty} \hlstd{=} \hlnum{3}\hlstd{,} \hlkwc{lwd} \hlstd{=} \hlnum{2}\hlstd{)}
 \hlkwd{legend}\hlstd{(}\hlstr{"topright"}\hlstd{,} \hlkwc{lwd} \hlstd{=} \hlnum{2}\hlstd{,} \hlkwc{lty} \hlstd{=} \hlnum{1}\hlopt{:}\hlnum{3}\hlstd{,} \hlkwc{col} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"black"}\hlstd{,} \hlstr{"purple"}\hlstd{,} \hlstr{"red"}\hlstd{),}
        \hlkwc{legend} \hlstd{=} \hlkwd{c}\hlstd{(}\hlstr{"OLS"}\hlstd{,} \hlstr{"Sen"}\hlstd{,} \hlstr{"Zhang"}\hlstd{))}
 \end{alltt}
